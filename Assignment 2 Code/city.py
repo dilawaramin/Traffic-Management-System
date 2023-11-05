@@ -51,7 +51,7 @@ def generate_city(grid_size, num_intersections, num_streets):
     return City
 
 # Test city
-City = generate_city(15, 10, 10)
+City = generate_city(10, 10, 10)
 # # Visualize city
 # nx.draw(City)
 # plt.margins(0.2)
