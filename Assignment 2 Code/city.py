@@ -1,5 +1,8 @@
-##### generate the city layout to be used by Q-learning #####
-
+"""
+Generate city and all related functions
+Author: Dilawar Amin
+Date: 11/05/2023
+"""
 # Use NetworkX library, represent city as a graph with nodes and edges
 # NOTE: Use "pip install networkx" beforehand
 import networkx as nx 
