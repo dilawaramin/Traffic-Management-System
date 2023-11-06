@@ -160,6 +160,19 @@ def current_xy(name):
         horizontal = name[1]
         vertical = name[3]
     return horizontal, vertical
+
+def set_destination(City, DP):
+    """
+    Function to set the reward for the destination point
+        Parameters: 
+            City: City graph object created by generate_city()
+            DP: Name of node which is destination
+        Returns:
+            None
+    """
+    h, v = current_xy(DP)
+    nx.set_node_attributes(city, {f"I{h},{v}":{'reward':100}})
+    return
     
 
 # Auxiliary print functions
@@ -211,7 +224,7 @@ def print_start_end(City, SP, EP):
     return 
 
 # TESTING
-city = generate_city(5, 5)
+city = generate_city(7, 7)
 # print_city(city)
 
 # if is_terminal_state(city, "I1,1"):
@@ -221,3 +234,6 @@ city = generate_city(5, 5)
 # h, v = get_dimensions(city)
 # print(f"Horizontal: {h}")
 # print(f"Vertical: {v}")
+# print_city(city)
+# set_destination(city, "I3,3")
+# print_city(city)

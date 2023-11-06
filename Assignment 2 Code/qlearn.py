@@ -74,12 +74,12 @@ def get_next_location(horizontal, vertical, action):
     
 
 # Main q learning function
-def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob):
+def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, epsilon):
     """
     Q Learning algorithm to route a vehicle from point A to B within the city
         Parameters:
             City: graph object representing city
-            start_node: Starting point of vehicle
+            start_node: Starting point of vehicle. Represnting as "I{X},{Y}" format
             end_node: Destination of vehicle
             num_episodes: Total # of times that q learning algorithm should 
                            repeat to train the A.I.
@@ -90,19 +90,25 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             None
     """
     #Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()} # chatgpt
-    
-    
+    # Get all nodes and rewards dictionary on standby
+    nodes = C.get_nodes(city)
+    rewards = C.get_rewards(city)
+    # Initialize the destination node
+    C.set_destination(city, end_node)
+    # Run through the algorithm according to predined num_episodes variable
     for episode in range(num_episodes):
         current_node = start_node
-        while current_node != end_node:
-            if random.uniform(0, 1) < exploration_prob:
-                next_node = random.choice(list(city.neighbors(current_node)))
-            else:
-                next_node = max(city.neighbors(current_node), key=lambda neighbor: Q[current_node][neighbor])
-            reward = city[current_node][next_node].get('reward', 0)
-            Q[current_node][next_node] = (1 - learning_rate) * Q[current_node][next_node] + \
-                learning_rate * (reward + discount_factor * max(Q[next_node].values()))
-            current_node = next_node
+        curr_horz, curr_vert = C.current_xy(current_node)
+        while C.is_terminal_state(city, current_node) != True:
+            # choose next action index
+            action = get_next_action(curr_horz, curr_vert, epsilon)
+            # store old node position, obtain new node position
+            old_horz = curr_horz
+            old_vert = curr_vert
+            curr_horz, curr_vert = get_next_location(curr_horz, curr_vert, action)
+            
+            
+        
        # Print Q-values for each episode
         print(f"Q-values after episode {episode + 1}:")
         for node in Q:
