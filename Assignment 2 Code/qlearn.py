@@ -26,7 +26,7 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
     """
     # Initialize Q-table as a dictionary with default values
     Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()}
-
+    print(Q.keys()) # DEBUGGING
     for episode in range(num_episodes):
         current_node = start_node
         while current_node != end_node:
@@ -52,16 +52,16 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
 
 print("Begin testing:")
 # generate city
-city = C.generate_city(10, 10, 10)
+city = C.generate_city(5, 10, 10)
 #C.print_city(city)
 
 # Set start and end points
-start_node = "I0, 0"
-end_node = "I6, 6"
+start_node = "I0,0"
+end_node = "I3,3"
 C.print_start_end(city, start_node, end_node)
 
 # Q-Learning hyperparameters
-num_episodes = 10
+num_episodes = 25
 learning_rate = 0.1
 discount_factor = 0.9
 exploration_prob = 0.1

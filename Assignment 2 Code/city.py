@@ -33,19 +33,19 @@ def generate_city(grid_size, num_intersections, num_streets):
     # Create Intersections (represented as nodes) following grid structure
     for x in range(grid_size):
         for y in range(grid_size):
-            node_name = f"I{x}, {y}"
+            node_name = f"I{x},{y}"
             City.add_node(node_name, pos=(x, y), type='intersection')
     
     # Create streets (represented as edges) to connect intersections
     for x in range(grid_size):
         for y in range(grid_size):
             if x < grid_size - 1:
-                node1 = f"I{x}, {y}"
-                node2 = f"I{x+1}, {y}"
+                node1 = f"I{x},{y}"
+                node2 = f"I{x+1},{y}"
                 City.add_edge(node1, node2, road_type="main")
             if y < grid_size - 1:
-                node1 = f"I{x}, {y}"
-                node2 = f"I{x}, {y+1}"
+                node1 = f"I{x},{y}"
+                node2 = f"I{x},{y+1}"
                 City.add_edge(node1, node2, road_type="main")
         
         
