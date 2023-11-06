@@ -51,16 +51,52 @@ def generate_city(grid_size, num_intersections, num_streets):
         
     return City
 
+
+def print_city(City):
+    """
+    Function to create visual representation of city object
+        Parameters: 
+            City: City graph object created by generate_city()
+        Returns:
+            None
+    """
+    # Create custom positions for all nodes
+    pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
+    # Formatting for the graph that is to be shown
+    nx.draw(City, pos, with_labels=True, node_size=200, node_color='lightblue', edge_color='gray', font_size=8, font_color='black')
+    # Show the city graph
+    plt.show()
+    
+    return 
+
+
+def print_start_end(City, SP, EP):
+    """
+    Function that prints the city and highlights starting point and destination
+        Parameters: 
+            City: City graph object created by generate_city()
+            SP: starting point
+            EP: Ending point
+        Returns:
+            None
+    """
+    # Create custom positions for all nodes
+    pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
+    # color mapping
+    def __node_color(node):
+        if node == SP or node == EP:
+            return 'red' 
+        else:
+            return 'lightblue'
+    # create list of colors for nodes
+    node_colors = [__node_color(node) for node in City.nodes()]
+    # Formatting for the graph that is to be shown
+    nx.draw(City, pos, with_labels=True, node_size=200, node_color=node_colors, edge_color='gray', font_size=8, font_color='black')
+    # Show the city graph
+    plt.show()
+
+    return 
+
+
 # Test city
 City = generate_city(10, 10, 10)
-# # Visualize city
-# nx.draw(City)
-# plt.margins(0.2)
-# plt.show()
-# Define a custom node position layout
-pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
-
-# Draw the graph with the spring layout
-nx.draw(City, pos, with_labels=True, node_size=200, node_color='lightblue', edge_color='gray', font_size=8, font_color='black')
-
-plt.show()
