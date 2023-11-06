@@ -10,6 +10,16 @@ import city as C
 import random
 import numpy as np
 
+# Global Variables
+# City:
+city = C.generate_city(7, 7)
+# q table
+q_values = C.create_q_table(city)
+# actions
+# Define actions (0 = up, 1 = right, 2 = down, 3 = left)
+actions = ['up', 'right', 'down', 'left']
+
+
 
 # def visualize_path(Q, start_node, end_node):
 #     current_node = start_node
@@ -20,7 +30,29 @@ import numpy as np
 
 # Helper Functions
 
+def get_next_action(horizontal, vertical, epsilon):
+    """
+    Function that determines the next action to take
+        Parameters: 
+            Horizontal: Current horizontal index
+            Vertical: Current vertical index
+            Epsilon: Exploration v.s. exploitation factor
+        Returns:
+            Integer between 0 and 3 which corresponds with action
+    """
+    # if randomly chosen value less than epsilon, use q table value
+    if np.random.random() < epsilon:
+       return np.argmax(q_values[horizontal, vertical])
+    # else select a random action
+    else:
+        return np.random.randint(4)
+    
+def get_next_location(horizontal, vertical, action):
+    new_horz = horizontal
+    new_vert = vertical
+    
 
+    
 
 # Main q learning function
 def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob):
@@ -38,11 +70,12 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
         Returns:
             None
     """
-    # Define actions (0 = up, 1 = right, 2 = down, 3 = left)
-    actions = ['up', 'right', 'down', 'left']
+
+    
     # Initialize Q-table as a dictionary with default values
-    Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()}
-    print(Q.keys()) # DEBUGGING
+    q_values = C.create_q_table(city)
+    #Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()} # chatgpt
+    
     for episode in range(num_episodes):
         current_node = start_node
         while current_node != end_node:

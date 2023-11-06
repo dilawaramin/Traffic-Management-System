@@ -65,6 +65,37 @@ def generate_city(horizontal, vertical):
 
 # Helper functions
 
+def get_dimensions(City):
+    """
+    Function that finds the dimensions of the city object
+        Parameters: 
+            City: City graph object created by generate_city()
+        Returns:
+            Horizontal: Horizontal length of city
+            Vertical: Vertical length of City
+    """
+    names = City.nodes()
+    horizontal = 0
+    vertical = 0
+    for name in names:
+        if int(name[1]) > horizontal:
+            horizontal = int(name[1])
+        if int(name[3]) > vertical:
+            vertical = int(name[3])
+    return horizontal + 1, vertical + 1
+
+def create_q_table(City):
+    """
+    Function that initializes empty q table
+        Parameters: 
+            City: City graph object created by generate_city()
+        Returns:
+            q_values: 3d array of q values intialized to 0
+    """
+    h, v = get_dimensions(City)
+    q_values = np.zeros((h, v, 4))
+    return q_values
+
 def is_terminal_state(City, name):
     """
     Function that determines if a node is a terminal state or not
@@ -76,7 +107,7 @@ def is_terminal_state(City, name):
     """
     rewards = nx.get_node_attributes(City, 'reward')
     # check if terminal state then return
-    return rewards[name] == -100
+    return rewards[name] != -1
 
 def get_rewards(City):
     """
@@ -89,6 +120,29 @@ def get_rewards(City):
     rewards = nx.get_node_attributes(City, 'reward')
     return rewards
 
+def get_nodes(City):
+    """
+    Function that returns a list of all nodes
+        Parameters: 
+            City: City graph object created by generate_city()
+        Returns:
+            Nodes: List of all nodes in city
+    """
+    nodes = City.nodes()
+    return nodes
+
+def current_node(horizontal, vertical):
+    """
+    Function that returns returns name of current node
+        Parameters: 
+            Horizontal: Current horizontal index
+            Vertical: Current vertical index
+        Returns:
+            name: Name of current node
+    """
+    name = f"I{horizontal},{vertical}"
+    return name
+    
 
 # Auxiliary print functions
 
@@ -139,10 +193,13 @@ def print_start_end(City, SP, EP):
     return 
 
 # TESTING
-# city = generate_city(5, 5)
+city = generate_city(5, 5)
 # print_city(city)
 
 # if is_terminal_state(city, "I1,1"):
 #     print('This is a terminal state')
 # else:
 #     print("not a terminal state")
+# h, v = get_dimensions(city)
+# print(f"Horizontal: {h}")
+# print(f"Vertical: {v}")
