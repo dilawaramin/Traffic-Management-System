@@ -95,31 +95,37 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
     rewards = C.get_rewards(city)
     # Initialize the destination node
     C.set_destination(city, end_node)
+    C.print_city(city)
     # Run through the algorithm according to predined num_episodes variable
     for episode in range(num_episodes):
+        print(f"Starting Episode {episode}.")
         current_node = start_node
         curr_horz, curr_vert = C.current_xy(current_node)
         while C.is_terminal_state(city, current_node) != True:
             
             # choose next action index
             action = get_next_action(curr_horz, curr_vert, epsilon)
+            print(f"choose action     H:{curr_horz} V:{curr_vert} E:{epsilon}")
             
             # store old node position, obtain new node position
             old_horz = curr_horz
             old_vert = curr_vert
             curr_horz, curr_vert = get_next_location(curr_horz, curr_vert, action)
+            print(f"get new node    H:{curr_horz} V:{curr_vert} A:{action}")
             
             # get reward for action, calculate temporal difference
             reward = rewards[C.current_node(curr_horz, curr_vert)]
             old_q_value = q_values[old_horz, old_vert, action]
             temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
+            print(f"reward     R:{reward} oldQ:{old_q_value} TD:{temp_difference}")
             
             # update q-value for the previous state and action pair
             new_q_value = old_q_value + (learning_rate * temp_difference)
             q_values[curr_horz, curr_vert, action] = new_q_value
+            print(f"updateQ     newQ:{new_q_value}")
 
             # debugging prints
-            
+            breakpoint
         # progress prints
         print(f"Episode {episode}/{num_episodes} complete!")
 
@@ -143,6 +149,7 @@ learning_rate = 0.1
 discount_factor = 0.9
 exploration_prob = 0.5
 
+print("prepare to start Q-Learning:")
  # Run Q-learning algorithm
 q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob)
 print("Finished running q_learning()")

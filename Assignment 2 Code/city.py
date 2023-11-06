@@ -159,7 +159,7 @@ def current_xy(name):
     else:
         horizontal = name[1]
         vertical = name[3]
-    return horizontal, vertical
+    return int(horizontal), int(vertical)
 
 def set_destination(City, DP):
     """
@@ -171,7 +171,7 @@ def set_destination(City, DP):
             None
     """
     h, v = current_xy(DP)
-    nx.set_node_attributes(city, {f"I{h},{v}":{'reward':100}})
+    nx.set_node_attributes(City, {f"I{h},{v}":{'reward':100}})
     return
     
 
@@ -224,7 +224,7 @@ def print_start_end(City, SP, EP):
     return 
 
 # TESTING
-city = generate_city(7, 7)
+# city = generate_city(7, 7)
 # print_city(city)
 
 # if is_terminal_state(city, "I1,1"):
