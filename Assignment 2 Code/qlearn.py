@@ -9,6 +9,15 @@ Date: 11/05/2023
 import city as C
 import random
 
+
+def visualize_path(Q, start_node, end_node):
+    current_node = start_node
+    while current_node != end_node:
+        best_action = max(Q[current_node], key=Q[current_node].get)
+        print(f"From {current_node} to {best_action}")
+        current_node = best_action
+
+
 def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob):
     """
     Q Learning algorithm to route a vehicle from point A to B within the city
@@ -38,15 +47,17 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             Q[current_node][next_node] = (1 - learning_rate) * Q[current_node][next_node] + \
                 learning_rate * (reward + discount_factor * max(Q[next_node].values()))
             current_node = next_node
-        # Print progress updates
-        print(f"Episode {episode+1}/{num_episodes} completed.")
-    
-    # Check if learning was successful
-    if Q[start_node][end_node] > 0:
-        print("Q-learning successfully learned a path from start_node to end_node.")
-    else:
-        print("Q-learning did not find a path from start_node to end_node.")
+       # Print Q-values for each episode
+        print(f"Q-values after episode {episode + 1}:")
+        for node in Q:
+            print(f"{node}: {Q[node]}")
 
+        # Print progress updates
+        print(f"Episode {episode + 1}/{num_episodes} completed.")
+
+
+    # Test if the algorithm works
+    #visualize_path(Q, start_node, end_node)
 
 ### TESTING ###
 
@@ -57,15 +68,17 @@ city = C.generate_city(5, 10, 10)
 
 # Set start and end points
 start_node = "I0,0"
-end_node = "I3,3"
+end_node = "I2,2"
 C.print_start_end(city, start_node, end_node)
 
 # Q-Learning hyperparameters
-num_episodes = 25
+num_episodes = 100
 learning_rate = 0.1
 discount_factor = 0.9
-exploration_prob = 0.1
+exploration_prob = 0.5
 
  # Run Q-learning algorithm
 q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob)
 print("Finished running q_learning()")
+
+
