@@ -8,16 +8,21 @@ Date: 11/05/2023
 # Import city, to create and print cities
 import city as C
 import random
+import numpy as np
 
 
-def visualize_path(Q, start_node, end_node):
-    current_node = start_node
-    while current_node != end_node:
-        best_action = max(Q[current_node], key=Q[current_node].get)
-        print(f"From {current_node} to {best_action}")
-        current_node = best_action
+# def visualize_path(Q, start_node, end_node):
+#     current_node = start_node
+#     while current_node != end_node:
+#         best_action = max(Q[current_node], key=Q[current_node].get)
+#         print(f"From {current_node} to {best_action}")
+#         current_node = best_action
+
+# Helper Functions
 
 
+
+# Main q learning function
 def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob):
     """
     Q Learning algorithm to route a vehicle from point A to B within the city
@@ -33,6 +38,8 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
         Returns:
             None
     """
+    # Define actions (0 = up, 1 = right, 2 = down, 3 = left)
+    actions = ['up', 'right', 'down', 'left']
     # Initialize Q-table as a dictionary with default values
     Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()}
     print(Q.keys()) # DEBUGGING
@@ -63,11 +70,11 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
 
 print("Begin testing:")
 # generate city
-city = C.generate_city(5, 10, 10)
+city = C.generate_city(5, 5)
 #C.print_city(city)
 
-# Set start and end points
-start_node = "I0,0"
+# Set start and end points NOTE: make sure they are not the outer nodes
+start_node = "I1,1"
 end_node = "I2,2"
 C.print_start_end(city, start_node, end_node)
 
@@ -77,8 +84,6 @@ learning_rate = 0.1
 discount_factor = 0.9
 exploration_prob = 0.5
 
- # Run Q-learning algorithm
-q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob)
-print("Finished running q_learning()")
-
-
+#  # Run Q-learning algorithm
+# q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob)
+# print("Finished running q_learning()")

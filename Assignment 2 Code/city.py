@@ -17,9 +17,13 @@ random.seed(0)
 np.random.seed(0)
 
 
-def generate_city(grid_size, num_intersections, num_streets):
+# City generation
+
+def generate_city(horizontal, vertical):
     """
-    Function that creates cities
+    Function that creates cities.
+    All outer nodes are considered terminal states. Starting and End point, as well as routing,
+    must take place within.
         Parameters:
             grid_size: desired overall size of city
             num_intersections: desired # of intersections
@@ -31,19 +35,26 @@ def generate_city(grid_size, num_intersections, num_streets):
     City = nx.Graph()
 
     # Create Intersections (represented as nodes) following grid structure
-    for x in range(grid_size):
-        for y in range(grid_size):
-            node_name = f"I{x},{y}"
-            City.add_node(node_name, pos=(x, y), type='intersection')
+    for x in range(horizontal):
+        for y in range(vertical):
+            if x ==  horizontal - 1 or y == vertical - 1:
+                node_name = f"I{x},{y}"
+                City.add_node(node_name, pos=(x, y), type='intersection', reward=-100) # terminal states
+            elif x ==  0 or y == 0:
+                node_name = f"I{x},{y}"
+                City.add_node(node_name, pos=(x, y), type='intersection', reward=-100) #terminal states
+            else:    
+                node_name = f"I{x},{y}"
+                City.add_node(node_name, pos=(x, y), type='intersection', reward=-1) # default reward
     
     # Create streets (represented as edges) to connect intersections
-    for x in range(grid_size):
-        for y in range(grid_size):
-            if x < grid_size - 1:
+    for x in range(horizontal):
+        for y in range(vertical):
+            if x < horizontal - 1:
                 node1 = f"I{x},{y}"
                 node2 = f"I{x+1},{y}"
                 City.add_edge(node1, node2, road_type="main")
-            if y < grid_size - 1:
+            if y < vertical - 1:
                 node1 = f"I{x},{y}"
                 node2 = f"I{x},{y+1}"
                 City.add_edge(node1, node2, road_type="main")
@@ -51,6 +62,35 @@ def generate_city(grid_size, num_intersections, num_streets):
         
     return City
 
+
+# Helper functions
+
+def is_terminal_state(City, name):
+    """
+    Function that determines if a node is a terminal state or not
+        Parameters: 
+            City: City graph object created by generate_city()
+            name: Name of node to be checked
+        Returns:
+            True or False
+    """
+    rewards = nx.get_node_attributes(City, 'reward')
+    # check if terminal state then return
+    return rewards[name] == -100
+
+def get_rewards(City):
+    """
+    Function that returns a dictionary with rewards of all nodes
+        Parameters: 
+            City: City graph object created by generate_city()
+        Returns:
+            rewards: Dictionary with rewards, name of nodes as keys
+    """
+    rewards = nx.get_node_attributes(City, 'reward')
+    return rewards
+
+
+# Auxiliary print functions
 
 def print_city(City):
     """
@@ -63,7 +103,8 @@ def print_city(City):
     # Create custom positions for all nodes
     pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
     # Formatting for the graph that is to be shown
-    nx.draw(City, pos, with_labels=True, node_size=200, node_color='lightblue', edge_color='gray', font_size=8, font_color='black')
+    labels = nx.get_node_attributes(City, 'reward')
+    nx.draw(City, pos, labels=labels, node_size=200, node_color='lightblue', edge_color='gray', font_size=8, font_color='black')
     # Show the city graph
     plt.show()
     
@@ -97,6 +138,11 @@ def print_start_end(City, SP, EP):
 
     return 
 
+# TESTING
+# city = generate_city(5, 5)
+# print_city(city)
 
-# Test city
-City = generate_city(10, 10, 10)
+# if is_terminal_state(city, "I1,1"):
+#     print('This is a terminal state')
+# else:
+#     print("not a terminal state")
