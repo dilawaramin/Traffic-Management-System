@@ -100,22 +100,28 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
         current_node = start_node
         curr_horz, curr_vert = C.current_xy(current_node)
         while C.is_terminal_state(city, current_node) != True:
+            
             # choose next action index
             action = get_next_action(curr_horz, curr_vert, epsilon)
+            
             # store old node position, obtain new node position
             old_horz = curr_horz
             old_vert = curr_vert
             curr_horz, curr_vert = get_next_location(curr_horz, curr_vert, action)
             
+            # get reward for action, calculate temporal difference
+            reward = rewards[C.current_node(curr_horz, curr_vert)]
+            old_q_value = q_values[old_horz, old_vert, action]
+            temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
             
-        
-       # Print Q-values for each episode
-        print(f"Q-values after episode {episode + 1}:")
-        for node in Q:
-            print(f"{node}: {Q[node]}")
+            # update q-value for the previous state and action pair
+            new_q_value = old_q_value + (learning_rate * temp_difference)
+            q_values[curr_horz, curr_vert, action] = new_q_value
 
-        # Print progress updates
-        print(f"Episode {episode + 1}/{num_episodes} completed.")
+            # debugging prints
+            
+        # progress prints
+        print(f"Episode {episode}/{num_episodes} complete!")
 
 
 
@@ -137,6 +143,6 @@ learning_rate = 0.1
 discount_factor = 0.9
 exploration_prob = 0.5
 
-#  # Run Q-learning algorithm
-# q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob)
-# print("Finished running q_learning()")
+ # Run Q-learning algorithm
+q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob)
+print("Finished running q_learning()")
