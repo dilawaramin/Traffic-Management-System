@@ -48,10 +48,29 @@ def get_next_action(horizontal, vertical, epsilon):
         return np.random.randint(4)
     
 def get_next_location(horizontal, vertical, action):
+    """
+    Function that takes current node position (x, y) and an action and 
+    returns the new node location 
+        Parameters: 
+            Horizontal: Current horizontal index
+            Vertical: Current vertical index
+            action: Index number of action
+        Returns:
+            new_horz: new x position of node
+            new_vert: new y position of node
+    """
     new_horz = horizontal
     new_vert = vertical
-    
-
+    h, v = C.get_dimensions(city)
+    if actions[action] == 'up' and horizontal > 0:
+        new_horz -= 1
+    elif actions[action] == 'right' and vertical < v - 1:
+        new_vert += 1
+    elif actions[action] == 'down' and horizontal < h - 1:
+        new_horz += 1
+    elif actions[action] == 'left' and vertical > 0:
+        new_vert -= 1
+    return new_horz, new_vert
     
 
 # Main q learning function
@@ -70,11 +89,8 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
         Returns:
             None
     """
-
-    
-    # Initialize Q-table as a dictionary with default values
-    q_values = C.create_q_table(city)
     #Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()} # chatgpt
+    
     
     for episode in range(num_episodes):
         current_node = start_node
@@ -96,8 +112,6 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
         print(f"Episode {episode + 1}/{num_episodes} completed.")
 
 
-    # Test if the algorithm works
-    #visualize_path(Q, start_node, end_node)
 
 ### TESTING ###
 

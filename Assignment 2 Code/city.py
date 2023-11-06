@@ -142,6 +142,24 @@ def current_node(horizontal, vertical):
     """
     name = f"I{horizontal},{vertical}"
     return name
+
+def current_xy(name):
+    """
+    Function that returns returns x and y position of the current node
+        Parameters: 
+            name: Name of current node   
+        Returns:
+            Horizontal: Current horizontal index
+            Vertical: Current vertical index
+    """
+    # make sure name is valid
+    if len(name) < 3:
+        print("\nInvalid name")
+        return
+    else:
+        horizontal = name[1]
+        vertical = name[3]
+    return horizontal, vertical
     
 
 # Auxiliary print functions
