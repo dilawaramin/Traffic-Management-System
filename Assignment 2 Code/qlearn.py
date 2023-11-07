@@ -51,7 +51,7 @@ def init_qlearn():
 
 ########################## Helper Functions ####################################################
 
-def get_next_action(horizontal, vertical, epsilon):
+def get_next_action(q_values, horizontal, vertical, epsilon):
     """
     Function that determines the next action to take
         Parameters: 
@@ -64,16 +64,17 @@ def get_next_action(horizontal, vertical, epsilon):
     # if randomly chosen value less than epsilon, use q table value
     randt = np.random.random()
     #print()
-    #print(randt)
+    print(randt)
     if randt < epsilon:
         action = np.argmax(q_values[horizontal, vertical])
-        #print(f"Action: {action}\n")
+        print(f"Action: {action}\n")
+        print(f"Q-Table: \n{q_values}\n")
         return action
     # else select a random action
     else:
         return np.random.randint(4)
     
-def get_next_location(horizontal, vertical, action):
+def get_next_location(city, horizontal, vertical, action):
     """
     Function that takes current node position (x, y) and an action and 
     returns the new node location 
@@ -116,7 +117,7 @@ def visualize_path(q_values, city, start, end):
         # Use q values to find best action and make move
         action = np.argmax(q_values[curr_x, curr_y])
         print(f"H:{curr_x}, V:{curr_y}, A:{actions[action]}")
-        new_x, new_y = get_next_location(curr_x, curr_y, action)
+        new_x, new_y = get_next_location(city, curr_x, curr_y, action)
         current_node = C.current_node(new_x, new_y)
         print(f"New Node: H:{new_x}, V:{new_y}\n")
         path.append(current_node)
@@ -127,9 +128,9 @@ def visualize_path(q_values, city, start, end):
 
 
 
-########################## Main q learning function  ####################################################
+########################## Main Q-learning function  ####################################################
 
-def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, epsilon):
+def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, epsilon, q_values):
     """
     Q Learning algorithm to route a vehicle from point A to B within the city
         Parameters:
@@ -145,8 +146,8 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             None
     """
     #Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()} # chatgpt
-    # Get all nodes on standby
-    nodes = C.get_nodes(city)
+    # Initialize visited states
+    visited = set()
     # set destination
     C.set_destination(city, end_node)
     # obtain list of reward
@@ -160,30 +161,26 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
         curr_horz, curr_vert = C.current_xy(current_node)
         #print(C.is_terminal_state(city, "I0,1"))
         # initialize a list for explored paths
-        path = [current_node]
-        C.set_reward(city, current_node, -50)
         while C.is_terminal_state(city, current_node) != True:
-            path.append(current_node)
             # debugging print
             #print(f"Current Node: {current_node}.")
-            # set a negative reward for returning to same node
-            if rewards[current_node] != 250 and rewards[current_node] != -100:
-                #print("setting node to -50")
-                C.set_reward(city, current_node, -50)
-                rewards = C.get_rewards(city)
+
             # choose next action index
-            action = get_next_action(curr_horz, curr_vert, epsilon)
+            action = get_next_action(q_values, curr_horz, curr_vert, epsilon)
             #print(f"Action: {actions[action]}")
             
             # store old node position, obtain new node position
             old_horz = curr_horz
             old_vert = curr_vert
-            curr_horz, curr_vert = get_next_location(curr_horz, curr_vert, action)
+            curr_horz, curr_vert = get_next_location(city, curr_horz, curr_vert, action)
             current_node = C.current_node(curr_horz, curr_vert)
             #print(f"New node: {current_node}")
             
             # get reward for action, calculate temporal difference
-            reward = rewards[current_node]
+            if current_node in visited:     # check if current state has been visited
+                reward = rewards[current_node] - C.REVISIT_PENALTY
+            else:
+                reward = rewards[current_node]
             old_q_value = q_values[old_horz, old_vert, action]
             temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
             #print(f"Reward: {reward}")
@@ -196,9 +193,11 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             #print(f"New Q:{new_q_value}")
             #print(f"Is terminal:{C.is_terminal_state(city, current_node)}\n")
             
+            # add visited node to visited set
+            visited.add(current_node)
+            
             # debugging prints
-        for node in path:
-            C.set_reward(city, node, -1)
+
             
         # progress prints
         print(f"Episode {episode + 1}/{num_episodes} complete!")
@@ -228,10 +227,10 @@ def main():
     # save original q table
     og_q = copy.deepcopy(q_values)
     # Run Q-learning algorithm
-    q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, epsilon)
+    q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, epsilon, q_values)
     print("Finished running q_learning()\n")
-    print(f"Original q table: {og_q}\n")
-    print(f"Updated q table: {q_values}\n")
+    print(f"Original q table: \n{og_q}\n")
+    print(f"Updated q table: \n{q_values}\n")
     
     visualize_path(q_values, city, start_node, end_node)
     print("stop here")

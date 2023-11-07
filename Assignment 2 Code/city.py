@@ -5,16 +5,28 @@ To be used by Q-Learning algorithm to create traffic management system
 Author: Dilawar Amin
 Date: 11/05/2023
 """
+########################## IMPORTS ####################################################
+
 # Use NetworkX library, represent city as a graph with nodes and edges
 # NOTE: Use "pip install networkx" beforehand
 import networkx as nx 
 # NOTE: Use "pip install matplotlib" to use the visualization functions
 import matplotlib.pyplot as plt
 import numpy as np
-import random
-seed = 0
-random.seed(0)
-np.random.seed(0)
+
+
+
+
+########################## GLOBAL VARIABLES ####################################################
+
+REWARD = 250            # Reward for goal
+NEIGHBOURS = 50         # Reward for being close to goal (neighbouring nodes)
+VISITED = -50           # Negative reward for states that have already been visited
+DEFAULT = -1            # Default reward for regular states
+TERMINAL = -100         # Negative reward associated with terminal states
+REVISIT_PENALTY = -99   # Extra penalty to be added to reward function for revisiting states
+
+
 
 
 ########################## City generation  ####################################################
@@ -39,13 +51,13 @@ def generate_city(horizontal, vertical):
         for y in range(vertical):
             if x ==  horizontal - 1 or y == vertical - 1:
                 node_name = f"I{x},{y}"
-                City.add_node(node_name, pos=(x, y), type='intersection', reward=-100) # terminal states
+                City.add_node(node_name, pos=(x, y), type='intersection', reward=TERMINAL) # terminal states
             elif x ==  0 or y == 0:
                 node_name = f"I{x},{y}"
-                City.add_node(node_name, pos=(x, y), type='intersection', reward=-100) #terminal states
+                City.add_node(node_name, pos=(x, y), type='intersection', reward=TERMINAL) #terminal states
             else:    
                 node_name = f"I{x},{y}"
-                City.add_node(node_name, pos=(x, y), type='intersection', reward=-1) # default reward
+                City.add_node(node_name, pos=(x, y), type='intersection', reward=DEFAULT) # default reward
     
     # Create streets (represented as edges) to connect intersections
     for x in range(horizontal):
@@ -181,7 +193,7 @@ def is_terminal_state(City, name):
     """
     rewards = nx.get_node_attributes(City, 'reward')
     # check if terminal state then return
-    bool = rewards[name] < -99 or rewards[name] == 250
+    bool = int(rewards[name]) == TERMINAL or int(rewards[name]) == REWARD
     return bool
 
 def get_rewards(City):
@@ -250,9 +262,9 @@ def set_destination(City, DP):
     for node in neighbors:
         h, v = current_xy(node)
         if rewards[node] != -100:
-            nx.set_node_attributes(City, {f"I{h},{v}":{'reward':50}})
+            nx.set_node_attributes(City, {f"I{h},{v}":{'reward':NEIGHBOURS}})
     h, v = current_xy(DP)
-    nx.set_node_attributes(City, {f"I{h},{v}":{'reward':250}})
+    nx.set_node_attributes(City, {f"I{h},{v}":{'reward':REWARD}})
     return
 
 def set_reward(City, node, reward):
