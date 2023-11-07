@@ -319,7 +319,9 @@ def print_start_end(City, SP, EP):
     pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
     # color mapping
     def __node_color(node):
-        if node == SP or node == EP:
+        if node == SP:
+            return 'blue'
+        elif node == EP:
             return 'red' 
         else:
             return 'lightblue'
@@ -347,8 +349,10 @@ def print_path(City, SP, EP, path):
     pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
     # color mapping
     def __node_color(node):
-        if node == SP or node == EP:
-            return 'red' 
+        if node == SP:
+            return 'red'
+        elif node == EP:
+            return 'blue' 
         elif node in path:
             return 'green'
         else:

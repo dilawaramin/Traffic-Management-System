@@ -12,10 +12,6 @@ import numpy as np
 import copy
 
 # Global Variables
-# City:
-city = C.generate_city(7, 7)
-# q table
-q_values = C.create_q_table(city)
 # actions
 # Define actions (0 = up, 1 = right, 2 = down, 3 = left)
 actions = ['up', 'right', 'down', 'left']
@@ -64,11 +60,10 @@ def get_next_action(q_values, horizontal, vertical, epsilon):
     # if randomly chosen value less than epsilon, use q table value
     randt = np.random.random()
     #print()
-    print(randt)
+    #print(randt)
     if randt < epsilon:
         action = np.argmax(q_values[horizontal, vertical])
-        print(f"Action: {action}\n")
-        print(f"Q-Table: \n{q_values}\n")
+        #print(f"Action: {action}\n")
         return action
     # else select a random action
     else:
@@ -146,17 +141,23 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             None
     """
     #Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()} # chatgpt
-    # Initialize visited states
-    visited = set()
     # set destination
     C.set_destination(city, end_node)
+    # Initialize visited states
+    visited = set()
     # obtain list of reward
     rewards = C.get_rewards(city)
     print(rewards[end_node])
     C.print_city(city)
     # Run through the algorithm according to predined num_episodes variable
     for episode in range(num_episodes):
-        #print(f"Starting Episode {episode + 1}.")
+        
+        # Hyperparameter decay rate
+        if episode > (num_episodes / 2):
+            epsilon = 0.9
+            learning_rate = 0.8
+            discount_factor = 0.7
+        
         current_node = start_node
         curr_horz, curr_vert = C.current_xy(current_node)
         #print(C.is_terminal_state(city, "I0,1"))
@@ -182,17 +183,19 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             else:
                 reward = rewards[current_node]
             old_q_value = q_values[old_horz, old_vert, action]
-            temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
+            ##### temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
+            temp_difference = reward + (discount_factor * np.max(old_q_value)) - old_q_value
             #print(f"Reward: {reward}")
             #print(f"Old Q : {old_q_value}")
             #print(f"Temp D: {temp_difference}")
             
             # update q-value for the previous state and action pair
             new_q_value = old_q_value + (learning_rate * temp_difference)
-            q_values[curr_horz, curr_vert, action] = new_q_value
+            ##### q_values[curr_horz, curr_vert, action] = new_q_value
+            q_values[old_horz, old_vert, action] = new_q_value
             #print(f"New Q:{new_q_value}")
             #print(f"Is terminal:{C.is_terminal_state(city, current_node)}\n")
-            
+            #print(f"Q-Table: \n{q_values}\n")
             # add visited node to visited set
             visited.add(current_node)
             
@@ -212,6 +215,7 @@ def main():
     print("Begin testing:")
     #C.print_city(city)
     city = C.generate_city(7, 7)
+    q_values = C.create_q_table(city)
     # Set start and end points NOTE: make sure they are not the outer nodes
     start_node = "I1,1"
     end_node = "I4,4"
@@ -219,9 +223,9 @@ def main():
 
     # Q-Learning hyperparameters
     num_episodes = 5000
-    learning_rate = 0.9
-    discount_factor = 0.5
-    epsilon = 0.9
+    learning_rate = 0.99
+    discount_factor = 0.9
+    epsilon = 0.75
 
     print("prepare to start Q-Learning:")
     # save original q table
