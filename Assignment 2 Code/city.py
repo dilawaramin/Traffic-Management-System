@@ -17,7 +17,7 @@ random.seed(0)
 np.random.seed(0)
 
 
-# City generation
+########################## City generation  ####################################################
 
 def generate_city(horizontal, vertical):
     """
@@ -63,7 +63,81 @@ def generate_city(horizontal, vertical):
     return City
 
 
-# Helper functions
+
+
+########################## Initialization Functions  ####################################################
+
+def initialize_city():
+    """
+    Function that initializes the city object via user inputs
+        Parameters: 
+            None
+        Returns:
+            city: City object, consisting of nodes and edges via networkx library
+    """
+    print("NOTE: Actual city dimensions will be 2 units x 2 units smaller than input. " +
+          "Outter edge of city is used as terminal state perimeter. For best performance, "
+          + "please try using a city size between 7x7 and 15x15. Minimum allowed city " +
+          "size is 4x4, which translate to a 2x2 useable grid.\n")
+    horizontal = int(input("Please enter horizontal dimension of city: "))
+    while horizontal <= 3:
+            horizontal = int(input("Invalid city size. Please enter horizontal dimension: "))
+    vertical = int(input("Please enter vertical dimension of city: "))
+    while vertical <= 3:
+            vertical = int(input("Invalid city size. Please enter vertical dimension: "))
+    print()
+    city = generate_city(horizontal, vertical)
+    return city
+    
+
+def get_start(City):
+    """
+    Function that initializes the starting point via user inputs
+        Parameters: 
+            None
+        Returns:
+            SP: Node name of starting point
+    """
+    # get city dimensions for error checking
+    x, y = get_dimensions(City)
+    start_X = int(input("Enter X coordinate of starting point: "))
+    while start_X >= x or start_X <= 0:
+            start_X = int(input("Invalid input. Please enter Starting point X coordinate: "))
+    start_Y = int(input("Enter Y coordinate of starting point: "))
+    while start_Y >= y or start_Y <= 0:
+            start_Y = int(input("Invalid input. Please enter Starting point Y coordinate: "))
+    SP = current_node(start_X, start_Y)
+    print()
+    return SP
+
+def get_destination(City, SP):
+    """
+    Function that initializes the starting point via user inputs
+        Parameters: 
+            None
+        Returns:
+            SP: Node name of starting point
+    """
+    # get city dimensions for error checking
+    x, y = get_dimensions(City)
+    # parse starting point
+    s, p = current_xy(SP)
+    start_X = int(input("Enter X coordinate of Destination: "))
+    while start_X >= x or start_X <= 0:
+            start_X = int(input("Invalid input. Please enter Destination X coordinate: "))
+    start_Y = int(input("Enter Y coordinate of Destination: "))
+    while start_Y >= y or start_Y <= 0:
+            start_Y = int(input("Invalid input. Please enter Destination Y coordinate: "))
+    DP = current_node(start_X, start_Y)
+    if start_X == s and start_Y == p:
+        print("Destination cannot be the same as starting point!!!")
+        DP = get_destination(City, SP)
+    print()
+    return DP
+
+
+
+########################## Helper functions  ####################################################
 
 def get_dimensions(City):
     """
@@ -107,7 +181,8 @@ def is_terminal_state(City, name):
     """
     rewards = nx.get_node_attributes(City, 'reward')
     # check if terminal state then return
-    return rewards[name] != -1
+    bool = rewards[name] < -99 or rewards[name] == 250
+    return bool
 
 def get_rewards(City):
     """
@@ -163,19 +238,41 @@ def current_xy(name):
 
 def set_destination(City, DP):
     """
-    Function to set the reward for the destination point
+    Function to set the reward for the destination point. Sets a medium reward for neighbors of dest.
         Parameters: 
             City: City graph object created by generate_city()
             DP: Name of node which is destination
         Returns:
             None
     """
+    neighbors = nx.neighbors(City, DP)
+    rewards = get_rewards(City)
+    for node in neighbors:
+        h, v = current_xy(node)
+        if rewards[node] != -100:
+            nx.set_node_attributes(City, {f"I{h},{v}":{'reward':50}})
     h, v = current_xy(DP)
-    nx.set_node_attributes(City, {f"I{h},{v}":{'reward':100}})
+    nx.set_node_attributes(City, {f"I{h},{v}":{'reward':250}})
+    return
+
+def set_reward(City, node, reward):
+    """
+    Function to set a custom reward for a given node
+        Parameters: 
+            City: City graph object created by generate_city()
+            DP: Name of node which is destination
+            reward: Custom reward amount
+        Returns:
+            None
+    """
+    h, v = current_xy(node)
+    nx.set_node_attributes(City, {f"I{h},{v}":{'reward':reward}})
     return
     
 
-# Auxiliary print functions
+
+
+########################## Auxiliary print functions ####################################################
 
 def print_city(City):
     """
@@ -223,17 +320,61 @@ def print_start_end(City, SP, EP):
 
     return 
 
-# TESTING
-# city = generate_city(7, 7)
-# print_city(city)
+def print_path(City, SP, EP, path):
+    """
+    Function that prints the city and highlights starting point and destination
+        Parameters: 
+            City: City graph object created by generate_city()
+            SP: starting point
+            EP: Ending point
+            path: List containing nodes on path
+        Returns:
+            None
+    """
+    # Create custom positions for all nodes
+    pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
+    # color mapping
+    def __node_color(node):
+        if node == SP or node == EP:
+            return 'red' 
+        elif node in path:
+            return 'green'
+        else:
+            return 'lightblue'
+    # create list of colors for nodes
+    node_colors = [__node_color(node) for node in City.nodes()]
+    # Formatting for the graph that is to be shown
+    nx.draw(City, pos, with_labels=True, node_size=200, node_color=node_colors, edge_color='gray', font_size=8, font_color='black')
+    # Show the city graph
+    plt.show()
 
-# if is_terminal_state(city, "I1,1"):
-#     print('This is a terminal state')
-# else:
-#     print("not a terminal state")
-# h, v = get_dimensions(city)
-# print(f"Horizontal: {h}")
-# print(f"Vertical: {v}")
-# print_city(city)
-# set_destination(city, "I3,3")
-# print_city(city)
+    return 
+
+
+
+
+########################## TESTING  ####################################################
+
+def main():
+    city = generate_city(7, 7)
+    # print_city(city)
+
+    # if is_terminal_state(city, "I1,1"):
+    #     print('This is a terminal state')
+    # else:
+    #     print("not a terminal state")
+    # h, v = get_dimensions(city)
+    # print(f"Horizontal: {h}")
+    # print(f"Vertical: {v}")
+    # print_city(city)
+    # set_destination(city, "I3,3")
+    # print_city(city)
+    SP = get_start(city)
+    print(SP)
+    print()
+    DP = get_destination(city, SP)
+    print(DP)
+
+if __name__ == '__main__':
+    main()
+    

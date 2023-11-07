@@ -22,14 +22,34 @@ actions = ['up', 'right', 'down', 'left']
 
 
 
-# def visualize_path(Q, start_node, end_node):
-#     current_node = start_node
-#     while current_node != end_node:
-#         best_action = max(Q[current_node], key=Q[current_node].get)
-#         print(f"From {current_node} to {best_action}")
-#         current_node = best_action
 
-# Helper Functions
+########################## Initialize Q-Learning ####################################################
+
+def init_qlearn():
+    """
+    Function that initializes the starting point via user inputs
+        Parameters: 
+            None
+        Returns:
+            num_episodes: How many times the algorithm will run a session to train the agent
+            learning_rate: How aggresively the algorithm will update
+            discount_factor: How strongly to value future v.s. current rewards
+            exploration_prob: How often to make random moves, encouraging exploration v.s. exploitation
+            
+    """
+    print("Lets initialize some important values for our Q-Learning algorithm.\n")
+    num_episodes = int(input("Episodes: The number of training episodes you wish to run (Ex. 1000): "))
+    learning_rate = float(input("Learning Rate: Controls how quickly the agent learns (Ex. 0.1): "))
+    discount_factor = float(input("Discount: Weighs immediate v.s. future rewards (Ex. 0.9 for near-term focus):"))
+    exploration_prob = float(input("Exploration: Rate at which to Balance exploration v.s. exploitation (Ex. 0.9 for exploration)."))
+    print()
+    return num_episodes, learning_rate, discount_factor, exploration_prob
+
+
+
+
+
+########################## Helper Functions ####################################################
 
 def get_next_action(horizontal, vertical, epsilon):
     """
@@ -63,18 +83,47 @@ def get_next_location(horizontal, vertical, action):
     new_horz = horizontal
     new_vert = vertical
     h, v = C.get_dimensions(city)
-    if actions[action] == 'up' and horizontal > 0:
+    if actions[action] == 'up':
         new_vert += 1
-    elif actions[action] == 'right' and vertical < v - 1:
+    elif actions[action] == 'right':
         new_horz += 1
-    elif actions[action] == 'down' and horizontal < h - 1:
+    elif actions[action] == 'down':
         new_vert -= 1
-    elif actions[action] == 'left' and vertical > 0:
+    elif actions[action] == 'left':
         new_horz -= 1
     return new_horz, new_vert
-    
 
-# Main q learning function
+def visualize_path(q_values, city, start, end):
+    """
+    Function that takes final Q-values to show what the agent learned 
+        Parameters: 
+            q_values: Q-table, make sure to train agent before hand
+        Returns:
+            None
+    """
+    # initialize starting node and path
+    current_node = start
+    C.set_destination(city, end)
+    path = [start]
+    print(start)
+    while C.is_terminal_state(city, current_node) != True:
+        curr_x, curr_y = C.current_xy(current_node)
+        # Use q values to find best action and make move
+        action = np.argmax(q_values[curr_x, curr_y])
+        print(f"H:{curr_x}, V:{curr_y}, A:{actions[action]}")
+        new_x, new_y = get_next_location(curr_x, curr_y, action)
+        current_node = C.current_node(new_x, new_y)
+        print(f"New Node: H:{new_x}, V:{new_y}\n")
+        path.append(current_node)
+    # call function in city.py to create visual graph
+    C.print_path(city, start, end, path)
+    # i think thats it
+    return
+
+
+
+########################## Main q learning function  ####################################################
+
 def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, epsilon):
     """
     Q Learning algorithm to route a vehicle from point A to B within the city
@@ -97,66 +146,84 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
     C.set_destination(city, end_node)
     # obtain list of reward
     rewards = C.get_rewards(city)
-    C.print_city(city)
+    print(rewards[end_node])
+    # C.print_city(city)
     # Run through the algorithm according to predined num_episodes variable
     for episode in range(num_episodes):
-        print(f"Starting Episode {episode + 1}.")
+        #print(f"Starting Episode {episode + 1}.")
         current_node = start_node
         curr_horz, curr_vert = C.current_xy(current_node)
-        print(C.is_terminal_state(city, "I0,1"))
+        #print(C.is_terminal_state(city, "I0,1"))
+        # initialize a list for explored paths
+        path = [current_node]
+        C.set_reward(city, current_node, -50)
         while C.is_terminal_state(city, current_node) != True:
             # debugging print
-            print(f"Current Node: {current_node}. Is true:{C.is_terminal_state(city, current_node)}")
+            #print(f"Current Node: {current_node}. Is terminal:{C.is_terminal_state(city, current_node)}")
+            # set a negative reward for returning to same node
+            if rewards[current_node] != 250:
+                C.set_reward(city, current_node, -50)
             # choose next action index
             action = get_next_action(curr_horz, curr_vert, epsilon)
-            print(f"choose action     H:{curr_horz} V:{curr_vert} A:{actions[action]}")
+            #print(f"Action: {actions[action]}")
             
             # store old node position, obtain new node position
             old_horz = curr_horz
             old_vert = curr_vert
             curr_horz, curr_vert = get_next_location(curr_horz, curr_vert, action)
             current_node = C.current_node(curr_horz, curr_vert)
-            print(f"get new node    H:{curr_horz} V:{curr_vert} A:{action}")
+            #print(f"New node: {current_node}")
             
             # get reward for action, calculate temporal difference
-            reward = rewards[C.current_node(curr_horz, curr_vert)]
+            reward = rewards[current_node]
             old_q_value = q_values[old_horz, old_vert, action]
             temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
-            print(f"reward     R:{reward} oldQ:{old_q_value} TD:{temp_difference}")
+            #print(f"reward R:{reward} oldQ:{old_q_value} TD:{temp_difference}")
             
             # update q-value for the previous state and action pair
             new_q_value = old_q_value + (learning_rate * temp_difference)
             q_values[curr_horz, curr_vert, action] = new_q_value
-            print(f"updateQ     newQ:{new_q_value}\n")
-
+            #print(f"newQ:{new_q_value}\n")
+            path.append(current_node)
             # debugging prints
             
         # progress prints
-        print(f"Episode {episode + 1}/{num_episodes} complete!\n")
+        print(f"Episode {episode + 1}/{num_episodes} complete!")
+    print()
 
 
 
-### TESTING ###
+########################## TESTING ####################################################
 
-print("Begin testing:")
-#C.print_city(city)
+def main():
+    
+    print("Begin testing:")
+    #C.print_city(city)
+    city = C.generate_city(7, 7)
+    # Set start and end points NOTE: make sure they are not the outer nodes
+    start_node = "I1,1"
+    end_node = "I4,4"
+    C.print_start_end(city, start_node, end_node)
 
-# Set start and end points NOTE: make sure they are not the outer nodes
-start_node = "I1,1"
-end_node = "I3,3"
-C.print_start_end(city, start_node, end_node)
+    # Q-Learning hyperparameters
+    num_episodes = 5000
+    learning_rate = 0.9
+    discount_factor = 0.5
+    epsilon = 0.9
 
-# Q-Learning hyperparameters
-num_episodes = 100
-learning_rate = 0.1
-discount_factor = 0.9
-exploration_prob = 0.9
+    print("prepare to start Q-Learning:")
+    # save original q table
+    og_q = copy.deepcopy(q_values)
+    # Run Q-learning algorithm
+    q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, epsilon)
+    print("Finished running q_learning()\n")
+    print(f"Original q table: {og_q}\n")
+    print(f"Updated q table: {q_values}\n")
+    
+    visualize_path(q_values, city, start_node, end_node)
+    print("stop here")
+    
 
-print("prepare to start Q-Learning:")
-# save original q table
-og_q = copy.deepcopy(q_values)
- # Run Q-learning algorithm
-q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob)
-print("Finished running q_learning()\n")
-print(f"Original q table: {og_q}\n")
-print(f"Updated q table: {q_values}")
+if __name__ == '__main__':
+    main()
+    print("Program terminated successfully")
