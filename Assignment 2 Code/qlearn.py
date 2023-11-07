@@ -9,6 +9,7 @@ Date: 11/05/2023
 import city as C
 import random
 import numpy as np
+import copy
 
 # Global Variables
 # City:
@@ -131,20 +132,18 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             # debugging prints
             
         # progress prints
-        print(f"Episode {episode + 1}/{num_episodes} complete!")
+        print(f"Episode {episode + 1}/{num_episodes} complete!\n")
 
 
 
 ### TESTING ###
 
 print("Begin testing:")
-# generate city
-city = C.generate_city(5, 5)
 #C.print_city(city)
 
 # Set start and end points NOTE: make sure they are not the outer nodes
 start_node = "I1,1"
-end_node = "I2,2"
+end_node = "I3,3"
 C.print_start_end(city, start_node, end_node)
 
 # Q-Learning hyperparameters
@@ -154,6 +153,10 @@ discount_factor = 0.9
 exploration_prob = 0.9
 
 print("prepare to start Q-Learning:")
+# save original q table
+og_q = copy.deepcopy(q_values)
  # Run Q-learning algorithm
 q_learning(city, start_node, end_node, num_episodes, learning_rate, discount_factor, exploration_prob)
-print("Finished running q_learning()")
+print("Finished running q_learning()\n")
+print(f"Original q table: {og_q}\n")
+print(f"Updated q table: {q_values}")
