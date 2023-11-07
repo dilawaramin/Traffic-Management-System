@@ -63,13 +63,13 @@ def get_next_location(horizontal, vertical, action):
     new_vert = vertical
     h, v = C.get_dimensions(city)
     if actions[action] == 'up' and horizontal > 0:
-        new_horz -= 1
-    elif actions[action] == 'right' and vertical < v - 1:
         new_vert += 1
-    elif actions[action] == 'down' and horizontal < h - 1:
+    elif actions[action] == 'right' and vertical < v - 1:
         new_horz += 1
-    elif actions[action] == 'left' and vertical > 0:
+    elif actions[action] == 'down' and horizontal < h - 1:
         new_vert -= 1
+    elif actions[action] == 'left' and vertical > 0:
+        new_horz -= 1
     return new_horz, new_vert
     
 
@@ -90,27 +90,31 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             None
     """
     #Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()} # chatgpt
-    # Get all nodes and rewards dictionary on standby
+    # Get all nodes on standby
     nodes = C.get_nodes(city)
-    rewards = C.get_rewards(city)
-    # Initialize the destination node
+    # set destination
     C.set_destination(city, end_node)
+    # obtain list of reward
+    rewards = C.get_rewards(city)
     C.print_city(city)
     # Run through the algorithm according to predined num_episodes variable
     for episode in range(num_episodes):
-        print(f"Starting Episode {episode}.")
+        print(f"Starting Episode {episode + 1}.")
         current_node = start_node
         curr_horz, curr_vert = C.current_xy(current_node)
+        print(C.is_terminal_state(city, "I0,1"))
         while C.is_terminal_state(city, current_node) != True:
-            
+            # debugging print
+            print(f"Current Node: {current_node}. Is true:{C.is_terminal_state(city, current_node)}")
             # choose next action index
             action = get_next_action(curr_horz, curr_vert, epsilon)
-            print(f"choose action     H:{curr_horz} V:{curr_vert} E:{epsilon}")
+            print(f"choose action     H:{curr_horz} V:{curr_vert} A:{actions[action]}")
             
             # store old node position, obtain new node position
             old_horz = curr_horz
             old_vert = curr_vert
             curr_horz, curr_vert = get_next_location(curr_horz, curr_vert, action)
+            current_node = C.current_node(curr_horz, curr_vert)
             print(f"get new node    H:{curr_horz} V:{curr_vert} A:{action}")
             
             # get reward for action, calculate temporal difference
@@ -122,12 +126,12 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             # update q-value for the previous state and action pair
             new_q_value = old_q_value + (learning_rate * temp_difference)
             q_values[curr_horz, curr_vert, action] = new_q_value
-            print(f"updateQ     newQ:{new_q_value}")
+            print(f"updateQ     newQ:{new_q_value}\n")
 
             # debugging prints
-            breakpoint
+            
         # progress prints
-        print(f"Episode {episode}/{num_episodes} complete!")
+        print(f"Episode {episode + 1}/{num_episodes} complete!")
 
 
 
@@ -147,7 +151,7 @@ C.print_start_end(city, start_node, end_node)
 num_episodes = 100
 learning_rate = 0.1
 discount_factor = 0.9
-exploration_prob = 0.5
+exploration_prob = 0.9
 
 print("prepare to start Q-Learning:")
  # Run Q-learning algorithm
