@@ -62,8 +62,13 @@ def get_next_action(horizontal, vertical, epsilon):
             Integer between 0 and 3 which corresponds with action
     """
     # if randomly chosen value less than epsilon, use q table value
-    if np.random.random() < epsilon:
-       return np.argmax(q_values[horizontal, vertical])
+    randt = np.random.random()
+    #print()
+    #print(randt)
+    if randt < epsilon:
+        action = np.argmax(q_values[horizontal, vertical])
+        #print(f"Action: {action}\n")
+        return action
     # else select a random action
     else:
         return np.random.randint(4)
@@ -83,13 +88,13 @@ def get_next_location(horizontal, vertical, action):
     new_horz = horizontal
     new_vert = vertical
     h, v = C.get_dimensions(city)
-    if actions[action] == 'up':
+    if actions[action] == 'up' and new_vert < v - 1:
         new_vert += 1
-    elif actions[action] == 'right':
+    elif actions[action] == 'right' and new_horz < h - 1:
         new_horz += 1
-    elif actions[action] == 'down':
+    elif actions[action] == 'down' and new_vert > 0:
         new_vert -= 1
-    elif actions[action] == 'left':
+    elif actions[action] == 'left' and new_horz > 0:
         new_horz -= 1
     return new_horz, new_vert
 
@@ -147,7 +152,7 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
     # obtain list of reward
     rewards = C.get_rewards(city)
     print(rewards[end_node])
-    # C.print_city(city)
+    C.print_city(city)
     # Run through the algorithm according to predined num_episodes variable
     for episode in range(num_episodes):
         #print(f"Starting Episode {episode + 1}.")
@@ -158,11 +163,14 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
         path = [current_node]
         C.set_reward(city, current_node, -50)
         while C.is_terminal_state(city, current_node) != True:
+            path.append(current_node)
             # debugging print
-            #print(f"Current Node: {current_node}. Is terminal:{C.is_terminal_state(city, current_node)}")
+            #print(f"Current Node: {current_node}.")
             # set a negative reward for returning to same node
-            if rewards[current_node] != 250:
+            if rewards[current_node] != 250 and rewards[current_node] != -100:
+                #print("setting node to -50")
                 C.set_reward(city, current_node, -50)
+                rewards = C.get_rewards(city)
             # choose next action index
             action = get_next_action(curr_horz, curr_vert, epsilon)
             #print(f"Action: {actions[action]}")
@@ -178,14 +186,19 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             reward = rewards[current_node]
             old_q_value = q_values[old_horz, old_vert, action]
             temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
-            #print(f"reward R:{reward} oldQ:{old_q_value} TD:{temp_difference}")
+            #print(f"Reward: {reward}")
+            #print(f"Old Q : {old_q_value}")
+            #print(f"Temp D: {temp_difference}")
             
             # update q-value for the previous state and action pair
             new_q_value = old_q_value + (learning_rate * temp_difference)
             q_values[curr_horz, curr_vert, action] = new_q_value
-            #print(f"newQ:{new_q_value}\n")
-            path.append(current_node)
+            #print(f"New Q:{new_q_value}")
+            #print(f"Is terminal:{C.is_terminal_state(city, current_node)}\n")
+            
             # debugging prints
+        for node in path:
+            C.set_reward(city, node, -1)
             
         # progress prints
         print(f"Episode {episode + 1}/{num_episodes} complete!")
