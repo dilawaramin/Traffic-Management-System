@@ -13,6 +13,7 @@ import networkx as nx
 # NOTE: Use "pip install matplotlib" to use the visualization functions
 import matplotlib.pyplot as plt
 import numpy as np
+# NOTE: Use "pip install numpy" before hand as well
 
 
 

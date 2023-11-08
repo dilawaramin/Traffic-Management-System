@@ -2,8 +2,9 @@
 Q Learning algorithm for traffic management system. Uses city.py to generate a city, and 
 runs/trains algorithm from qlearn.py. 
 
-NOTE: NetworkX and matplotlib.pyplot are required for this to run
-Install by using "pip install networkx" and "pip install matplotlib"
+NOTE: NetworkX, matplotlib.pyplot, and numpy are required for this to run
+Install by using "pip install networkx", "pip install matplotlib" and 
+"pip install numpy" before running this program.
 
 Author:     Dilawar Amin
 Date:       11/05/2023
