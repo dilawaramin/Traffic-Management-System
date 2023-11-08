@@ -38,7 +38,7 @@ def main():
     print(f"Q-Learning training completed in {tam:.4} seconds.\n")
     
     # Show what the agent learned
-    print("The agent has learned the following path (A separate window will open)")
+    print("The agent has learned the following path (A separate window will open):")
     os.system('pause')
     Q.visualize_path(q_values, City, Start, Destination)
     print()

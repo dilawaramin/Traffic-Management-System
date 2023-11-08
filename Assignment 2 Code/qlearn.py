@@ -34,10 +34,10 @@ def init_qlearn():
             
     """
     print("Lets initialize some important values for our Q-Learning algorithm.\n")
-    num_episodes = int(input("Episodes: The number of training episodes you wish to run (Ex. 1000): "))
-    learning_rate = float(input("Learning Rate: Controls how quickly the agent learns (Ex. 0.9): "))
-    discount_factor = float(input("Discount: Weighs immediate v.s. future rewards (Ex. 0.9 for near-term focus): "))
-    epsilon = float(input("Exploration: Rate at which to Balance exploration v.s. exploitation (Ex. 0.9 for exploration): "))
+    num_episodes = int(input("Episodes: The number of training episodes you wish to run (Suggested: 1000): "))
+    learning_rate = float(input("Learning Rate: Controls how quickly the agent learns (Suggested: 0.9): "))
+    discount_factor = float(input("Discount: Weighs immediate v.s. future rewards (Suggested: 0.9): "))
+    epsilon = float(input("Exploration: Rate at which to Balance exploration v.s. exploitation (Suggested: 0.9): "))
     print()
     return num_episodes, learning_rate, discount_factor, epsilon
 

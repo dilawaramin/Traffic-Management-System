@@ -110,6 +110,10 @@ def get_start(City):
         Returns:
             SP: Node name of starting point
     """
+    # Remind user about invalid inputs
+    print("NOTE: Cannot user outer points as start or end, as they are reserved as" +
+          "City perimeter. For example, (0, 0) is invalid. and for a city size of 7x7," +
+          "(6, 6) is invalid.")
     # get city dimensions for error checking
     x, y = get_dimensions(City)
     start_X = int(input("Enter X coordinate of starting point: "))
