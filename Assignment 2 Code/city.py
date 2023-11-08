@@ -88,7 +88,7 @@ def initialize_city():
         Returns:
             city: City object, consisting of nodes and edges via networkx library
     """
-    print("NOTE: Actual city dimensions will be 2 units x 2 units smaller than input. " +
+    print("\nNOTE: Actual city dimensions will be 2 units x 2 units smaller than input. " +
           "Outter edge of city is used as a terminal state perimeter. Currently, only a "
           + "city size of 4x4 up to 9x9 is supported. Minimum allowed city " +
           "size is 4x4, which translate to a 2x2 useable grid.\n")
