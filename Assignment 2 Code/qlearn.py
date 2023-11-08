@@ -35,12 +35,11 @@ def init_qlearn():
     """
     print("Lets initialize some important values for our Q-Learning algorithm.\n")
     num_episodes = int(input("Episodes: The number of training episodes you wish to run (Ex. 1000): "))
-    learning_rate = float(input("Learning Rate: Controls how quickly the agent learns (Ex. 0.1): "))
-    discount_factor = float(input("Discount: Weighs immediate v.s. future rewards (Ex. 0.9 for near-term focus):"))
-    exploration_prob = float(input("Exploration: Rate at which to Balance exploration v.s. exploitation (Ex. 0.9 for exploration)."))
+    learning_rate = float(input("Learning Rate: Controls how quickly the agent learns (Ex. 0.9): "))
+    discount_factor = float(input("Discount: Weighs immediate v.s. future rewards (Ex. 0.9 for near-term focus): "))
+    epsilon = float(input("Exploration: Rate at which to Balance exploration v.s. exploitation (Ex. 0.9 for exploration): "))
     print()
-    return num_episodes, learning_rate, discount_factor, exploration_prob
-
+    return num_episodes, learning_rate, discount_factor, epsilon
 
 
 
@@ -104,17 +103,16 @@ def visualize_path(q_values, city, start, end):
     """
     # initialize starting node and path
     current_node = start
-    C.set_destination(city, end)
     path = [start]
-    print(start)
+    #print(start)
     while C.is_terminal_state(city, current_node) != True:
         curr_x, curr_y = C.current_xy(current_node)
         # Use q values to find best action and make move
         action = np.argmax(q_values[curr_x, curr_y])
-        print(f"H:{curr_x}, V:{curr_y}, A:{actions[action]}")
+        #print(f"H:{curr_x}, V:{curr_y}, A:{actions[action]}")
         new_x, new_y = get_next_location(city, curr_x, curr_y, action)
         current_node = C.current_node(new_x, new_y)
-        print(f"New Node: H:{new_x}, V:{new_y}\n")
+        #print(f"New Node: H:{new_x}, V:{new_y}\n")
         path.append(current_node)
     # call function in city.py to create visual graph
     C.print_path(city, start, end, path)
@@ -140,22 +138,17 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
         Returns:
             None
     """
-    #Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()} # chatgpt
-    # set destination
-    C.set_destination(city, end_node)
     # obtain list of rewards
     rewards = C.get_rewards(city)
-    print(rewards[end_node])
-    C.print_city(city)
+    
     # Run through the algorithm according to predined num_episodes variable
     for episode in range(num_episodes):
         
-        # Initialize visited states
-        visited = set()
-        
+        # set current node
         current_node = start_node
         curr_horz, curr_vert = C.current_xy(current_node)
-        #print(C.is_terminal_state(city, "I0,1"))
+        
+        # begin looping until a terminal state is reached
         while C.is_terminal_state(city, current_node) != True:
             # debugging print
             #print(f"Current Node: {current_node}.")
@@ -194,17 +187,18 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             q_values[old_horz, old_vert, action] = new_q_value
             #print(f"New Q: {new_q_value}")
 
-
             #print(f"Q-Table: \n{q_values}\n")
-            # add visited node to visited set
-            visited.add(current_node)
-            
             # debugging prints
 
-            
         # progress prints
         print(f"Episode {episode + 1}/{num_episodes} complete!")
     print()
+
+
+
+
+########################## AUXILIARY FUNCTIONS ####################################################
+
 
 
 
@@ -217,8 +211,8 @@ def main():
     city = C.generate_city(9, 9)
     q_values = C.create_q_table(city)
     # Set start and end points NOTE: make sure they are not the outer nodes
-    start_node = "I3,3"
-    end_node = "I1,6"
+    start_node = "I2,2"
+    end_node = "I7,7"
     C.print_start_end(city, start_node, end_node)
 
     # Q-Learning hyperparameters

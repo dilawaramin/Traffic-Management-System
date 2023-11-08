@@ -70,9 +70,9 @@ def generate_city(horizontal, vertical):
                 node1 = f"I{x},{y}"
                 node2 = f"I{x},{y+1}"
                 City.add_edge(node1, node2, road_type="main")
-        
-        
-    return City
+    # Create Q-Table for city
+    q_values = create_q_table(City)
+    return City, q_values
 
 
 
@@ -88,8 +88,8 @@ def initialize_city():
             city: City object, consisting of nodes and edges via networkx library
     """
     print("NOTE: Actual city dimensions will be 2 units x 2 units smaller than input. " +
-          "Outter edge of city is used as terminal state perimeter. For best performance, "
-          + "please try using a city size between 7x7 and 15x15. Minimum allowed city " +
+          "Outter edge of city is used as a terminal state perimeter. Currently, only a "
+          + "city size of 4x4 up to 9x9 is supported. Minimum allowed city " +
           "size is 4x4, which translate to a 2x2 useable grid.\n")
     horizontal = int(input("Please enter horizontal dimension of city: "))
     while horizontal <= 3:
@@ -124,7 +124,8 @@ def get_start(City):
 
 def get_destination(City, SP):
     """
-    Function that initializes the starting point via user inputs
+    Function that initializes the starting point via user inputs. Will call "set_definition(City, DP)"
+    to set the reward for destination as well.
         Parameters: 
             None
         Returns:
@@ -144,6 +145,8 @@ def get_destination(City, SP):
     if start_X == s and start_Y == p:
         print("Destination cannot be the same as starting point!!!")
         DP = get_destination(City, SP)
+        # Set reward for destination
+    set_destination(City, DP)
     print()
     return DP
 
