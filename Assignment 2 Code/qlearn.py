@@ -143,25 +143,19 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
     #Q = {node: {neighbor: 0 for neighbor in city.neighbors(node)} for node in city.nodes()} # chatgpt
     # set destination
     C.set_destination(city, end_node)
-    # Initialize visited states
-    visited = set()
-    # obtain list of reward
+    # obtain list of rewards
     rewards = C.get_rewards(city)
     print(rewards[end_node])
     C.print_city(city)
     # Run through the algorithm according to predined num_episodes variable
     for episode in range(num_episodes):
         
-        # Hyperparameter decay rate
-        if episode > (num_episodes / 2):
-            epsilon = 0.9
-            learning_rate = 0.8
-            discount_factor = 0.7
+        # Initialize visited states
+        visited = set()
         
         current_node = start_node
         curr_horz, curr_vert = C.current_xy(current_node)
         #print(C.is_terminal_state(city, "I0,1"))
-        # initialize a list for explored paths
         while C.is_terminal_state(city, current_node) != True:
             # debugging print
             #print(f"Current Node: {current_node}.")
@@ -170,31 +164,37 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             action = get_next_action(q_values, curr_horz, curr_vert, epsilon)
             #print(f"Action: {actions[action]}")
             
-            # store old node position, obtain new node position
+            # store old node position
             old_horz = curr_horz
             old_vert = curr_vert
+            
+            # Obtain new location, with action
             curr_horz, curr_vert = get_next_location(city, curr_horz, curr_vert, action)
+            
+            # Contruct X and Y coordinates into new current node
             current_node = C.current_node(curr_horz, curr_vert)
             #print(f"New node: {current_node}")
             
-            # get reward for action, calculate temporal difference
-            if current_node in visited:     # check if current state has been visited
-                reward = rewards[current_node] - C.REVISIT_PENALTY
-            else:
-                reward = rewards[current_node]
-            old_q_value = q_values[old_horz, old_vert, action]
-            ##### temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
-            temp_difference = reward + (discount_factor * np.max(old_q_value)) - old_q_value
+            # get reward for action
+            reward = rewards[current_node]
             #print(f"Reward: {reward}")
+
+            # Find Q value of old position
+            old_q_value = q_values[old_horz, old_vert, action]
             #print(f"Old Q : {old_q_value}")
+            
+            # Calculate Temporal Difference
+            temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
             #print(f"Temp D: {temp_difference}")
+            ##### temp_difference = reward + (discount_factor * np.max(q_values[curr_horz, curr_vert])) - old_q_value
+            # temp_difference = reward + (discount_factor * np.max(old_q_value)) - old_q_value
             
             # update q-value for the previous state and action pair
             new_q_value = old_q_value + (learning_rate * temp_difference)
-            ##### q_values[curr_horz, curr_vert, action] = new_q_value
             q_values[old_horz, old_vert, action] = new_q_value
-            #print(f"New Q:{new_q_value}")
-            #print(f"Is terminal:{C.is_terminal_state(city, current_node)}\n")
+            #print(f"New Q: {new_q_value}")
+
+
             #print(f"Q-Table: \n{q_values}\n")
             # add visited node to visited set
             visited.add(current_node)
@@ -214,18 +214,18 @@ def main():
     
     print("Begin testing:")
     #C.print_city(city)
-    city = C.generate_city(7, 7)
+    city = C.generate_city(9, 9)
     q_values = C.create_q_table(city)
     # Set start and end points NOTE: make sure they are not the outer nodes
-    start_node = "I1,1"
-    end_node = "I4,4"
+    start_node = "I3,3"
+    end_node = "I1,6"
     C.print_start_end(city, start_node, end_node)
 
     # Q-Learning hyperparameters
-    num_episodes = 5000
-    learning_rate = 0.99
+    num_episodes = 1000
+    learning_rate = 0.9
     discount_factor = 0.9
-    epsilon = 0.75
+    epsilon = 0.9
 
     print("prepare to start Q-Learning:")
     # save original q table

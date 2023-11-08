@@ -19,8 +19,8 @@ import numpy as np
 
 ########################## GLOBAL VARIABLES ####################################################
 
-REWARD = 250            # Reward for goal
-NEIGHBOURS = 50         # Reward for being close to goal (neighbouring nodes)
+REWARD = 0            # Reward for goal
+NEIGHBOURS = -1         # Reward for being close to goal (neighbouring nodes)
 VISITED = -50           # Negative reward for states that have already been visited
 DEFAULT = -1            # Default reward for regular states
 TERMINAL = -100         # Negative reward associated with terminal states
@@ -350,9 +350,9 @@ def print_path(City, SP, EP, path):
     # color mapping
     def __node_color(node):
         if node == SP:
-            return 'red'
+            return 'blue'
         elif node == EP:
-            return 'blue' 
+            return 'red' 
         elif node in path:
             return 'green'
         else:
