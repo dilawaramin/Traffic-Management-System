@@ -7,7 +7,6 @@ Date: 11/05/2023
 """
 # Import city, to create and print cities
 import city as C
-import random
 import numpy as np
 import copy
 

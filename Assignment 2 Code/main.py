@@ -2,6 +2,9 @@
 Q Learning algorithm for traffic management system. Uses city.py to generate a city, and 
 runs/trains algorithm from qlearn.py. 
 
+NOTE: NetworkX and matplotlib.pyplot are required for this to run
+Install by using "pip install networkx" and "pip install matplotlib"
+
 Author:     Dilawar Amin
 Date:       11/05/2023
 """
@@ -9,6 +12,9 @@ import qlearn as Q
 import city as C 
 import os
 import time
+
+
+
 
 def main():
     
