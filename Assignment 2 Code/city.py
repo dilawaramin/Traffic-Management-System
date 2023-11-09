@@ -20,12 +20,13 @@ import numpy as np
 
 ########################## GLOBAL VARIABLES ####################################################
 
-REWARD = 0            # Reward for goal
-NEIGHBOURS = -1         # Reward for being close to goal (neighbouring nodes)
+REWARD = 20            # Reward for goal
+NEIGHBOURS = 20         # Reward for being close to goal (neighbouring nodes)
 VISITED = -50           # Negative reward for states that have already been visited
 DEFAULT = -1            # Default reward for regular states
 TERMINAL = -100         # Negative reward associated with terminal states
 REVISIT_PENALTY = -99   # Extra penalty to be added to reward function for revisiting states
+TRAFFIC_LIGHT = -20     # Negative reward for traffic nodes
 
 
 
@@ -78,6 +79,28 @@ def generate_city(horizontal, vertical):
 
 
 
+########################## City Manipulation ####################################################
+
+def generate_traffic():
+    """
+    Function that generates procedurally generates traffic, according to 
+    All outer nodes are considered terminal states. Starting and End point, as well as routing,
+    must take place within.
+        Parameters:
+            grid_size: desired overall size of city
+            num_intersections: desired # of intersections
+            num_streets: desired number of streets
+        Returns:
+            G: Graph, representing city as a network of nodes and edges
+    """
+    
+    
+    return
+
+
+
+
+
 ########################## Initialization Functions  ####################################################
 
 def initialize_city():
@@ -88,10 +111,11 @@ def initialize_city():
         Returns:
             city: City object, consisting of nodes and edges via networkx library
     """
-    print("\nNOTE: Actual city dimensions will be 2 units x 2 units smaller than input. " +
-          "Outter edge of city is used as a terminal state perimeter. Currently, only a "
-          + "city size of 4x4 up to 9x9 is supported. Minimum allowed city " +
-          "size is 4x4, which translate to a 2x2 useable grid.\n")
+    print("\nNOTE: Actual city dimensions will be 1 unit x 1 unit smaller than input, due " +
+          "to coordinates starting at (0, 0). Outter edge of city is used as a terminal "
+          + "state perimeter. We do not recommend a city size of greater than 15x15, for " +
+          "performance related reasons. Minimum allowed city size is 4x4, which translates" +
+           "to a 2x2 useable grid.\n")
     horizontal = int(input("Please enter horizontal dimension of city: "))
     while horizontal <= 3:
             horizontal = int(input("Invalid city size. Please enter horizontal dimension: "))
@@ -112,9 +136,9 @@ def get_start(City):
             SP: Node name of starting point
     """
     # Remind user about invalid inputs
-    print("NOTE: Cannot user outer points as start or end, as they are reserved as" +
-          "City perimeter. For example, (0, 0) is invalid. and for a city size of 7x7," +
-          "(6, 6) is invalid.")
+    print("NOTE: Cannot user outer points as start or end, as they are reserved as " +
+          "City perimeter. For example, (0, 0) is invalid. and for a city size of 7x7, " +
+          "a starting point of (6, 6) is invalid.")
     # get city dimensions for error checking
     x, y = get_dimensions(City)
     start_X = int(input("Enter X coordinate of starting point: "))
@@ -172,10 +196,15 @@ def get_dimensions(City):
     horizontal = 0
     vertical = 0
     for name in names:
-        if int(name[1]) > horizontal:
-            horizontal = int(name[1])
-        if int(name[3]) > vertical:
-            vertical = int(name[3])
+        X, Y = current_xy(name)
+        if X > horizontal:
+            horizontal = X
+        if Y > vertical:
+            vertical = Y
+        # if int(name[1]) > horizontal:
+        #     horizontal = int(name[1])
+        # if int(name[3]) > vertical:
+        #     vertical = int(name[3])
     return horizontal + 1, vertical + 1
 
 def create_q_table(City):
@@ -238,7 +267,7 @@ def current_node(horizontal, vertical):
     name = f"I{horizontal},{vertical}"
     return name
 
-def current_xy(name):
+def SET_ASIDE_current_xy(name):     # set aside while testing V.2 of this function
     """
     Function that returns returns x and y position of the current node
         Parameters: 
@@ -288,6 +317,27 @@ def set_reward(City, node, reward):
     h, v = current_xy(node)
     nx.set_node_attributes(City, {f"I{h},{v}":{'reward':reward}})
     return
+
+def current_xy(name):
+    """
+    Function that returns returns x and y position of the current node.
+        Parameters: 
+            name: Name of current node   
+        Returns:
+            Horizontal: Current horizontal index
+            Vertical: Current vertical index
+    """
+    # if city dimensions are single digits
+    if len(name) == 4:
+        horizontal = name[1]
+        vertical = name[3]
+    # Parse the string if coordinates are double digit
+    else:
+        name = name[1:]
+        horizontal, vertical = name.split(',')
+        horizontal = horizontal
+        vertical = vertical
+    return int(horizontal), int(vertical)
     
 
 
