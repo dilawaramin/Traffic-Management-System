@@ -120,7 +120,7 @@ def get_start(City):
     # Remind user about invalid inputs
     print("NOTE: Cannot use outer points as start or end, as they are reserved as " +
           "City perimeter. For example, (0, 0) is invalid. and for a city size of 7x7, " +
-          "a starting point of (6, 6) is invalid.")
+          "a starting point of (6, 6) is invalid.\n")
     # get city dimensions for error checking
     x, y = get_dimensions(City)
     start_X = int(input("Enter X coordinate of starting point: "))
@@ -180,24 +180,23 @@ def generate_traffic(City):
     city_x, city_y = get_dimensions(City)
     total_perimeter = city_x + city_y
     # cases for city sizes
+    # 2 spots of congestion for a city 15x15 or smaller
     if total_perimeter <= 15:
-        __generate_traffic(City)
-        
+        for i in range(1):
+            __generate_traffic(City)
+    # 4 spots of congestion for a city 10x10 or smaller
     elif total_perimeter <= 20:
-        __generate_traffic(City)
-        __generate_traffic(City)
-        
+        for i in range(3):
+            __generate_traffic(City)
+    # 7 spots of congestion for a city 15x15 or smaller
     elif total_perimeter <= 30:
-        __generate_traffic(City)
-        __generate_traffic(City)
-        __generate_traffic(City)
-        
+        for i in range (6):
+            __generate_traffic(City)
+    # 9 spots of congestion for a city 25x25 or smaller
     elif total_perimeter <= 50:
-        __generate_traffic(City)
-        __generate_traffic(City)
-        __generate_traffic(City)
-        __generate_traffic(City)
-    
+        for i in range(8):
+            __generate_traffic(City)
+            
     return
 
 
@@ -411,10 +410,15 @@ def __generate_traffic(City):
     while rewards[traffic_node] != DEFAULT:
         traffic_node = get_random_node(City)
     # get neighbouring nodes to create congestion
-    traffic = nx.neighbors(City, traffic_node)
+    trafficNX = nx.neighbors(City, traffic_node)
+    traffic = []
+    for node in trafficNX:
+        traffic.append(node)
+    traffic.append(traffic_node)
     for node in traffic:
         if rewards[node] == DEFAULT:
             set_reward(City, node, TRAFFIC)
+    return
     
 
 
@@ -535,6 +539,9 @@ def main():
     print(DP)
     generate_traffic(city)
     print_start_end(city, SP, DP)
+    nodes = city.nodes()
+    print(nodes)
+    print(type(nodes))
 
 if __name__ == '__main__':
     main()

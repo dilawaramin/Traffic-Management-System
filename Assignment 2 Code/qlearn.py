@@ -40,6 +40,25 @@ def init_qlearn():
     print()
     return num_episodes, learning_rate, discount_factor, epsilon
 
+def init_qlearn_default():
+    """
+    Function that initializes the starting point via default, pre-determined values
+        Parameters: 
+            None
+        Returns:
+            num_episodes: How many times the algorithm will run a session to train the agent
+            learning_rate: How aggresively the algorithm will update
+            discount_factor: How strongly to value future v.s. current rewards
+            exploration_prob: How often to make random moves, encouraging exploration v.s. exploitation
+            
+    """
+    num_episodes = 1000
+    learning_rate = 0.9
+    discount_factor = 0.9
+    epsilon = 0.9
+    print("Q-Learning hyper-parameters have been set to their default values.\n")
+    return num_episodes, learning_rate, discount_factor, epsilon
+
 
 
 
@@ -190,7 +209,7 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
             # debugging prints
 
         # progress prints
-        print(f"Episode {episode + 1}/{num_episodes} complete!")
+        print(f"Episode {episode + 1}/{num_episodes} complete")
     print()
 
 

@@ -26,12 +26,18 @@ def main():
     C.generate_traffic(City)
     
     # Initialize Q-Learning variables
-    num_episodes, learning_rate, discount_factor, epsilon = Q.init_qlearn()
+    ans = input("Would you like to set your own Q-Learning hyperparameters (Y/N)?\n")
+    while ans.lower() != 'y' and ans.lower() != 'n':
+        ans = input("Invalid Input. Do you wish to set your own parameters (Y/N)?")
+    if ans == 'y':
+        num_episodes, learning_rate, discount_factor, epsilon = Q.init_qlearn()
+    else:
+        num_episodes, learning_rate, discount_factor, epsilon = Q.init_qlearn_default()
     
     # Show starting and end points on city map
     print("A pop up window will display your city layout, as well " +
           "as starting and ending points as blue and red, respectively. " +
-          "Traffic congestion is indicatedwith orange. ")
+          "Traffic congestion is indicated with orange. ")
     os.system('pause')
     print()
     C.print_start_end(City, Start, Destination)
