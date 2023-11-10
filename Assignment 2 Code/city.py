@@ -10,10 +10,14 @@ Date: 11/05/2023
 # Use NetworkX library, represent city as a graph with nodes and edges
 # NOTE: Use "pip install networkx" beforehand
 import networkx as nx 
+
 # NOTE: Use "pip install matplotlib" to use the visualization functions
 import matplotlib.pyplot as plt
-import numpy as np
+
 # NOTE: Use "pip install numpy" before hand as well
+import numpy as np
+import random
+
 
 
 
@@ -26,7 +30,7 @@ VISITED = -50           # Negative reward for states that have already been visi
 DEFAULT = -1            # Default reward for regular states
 TERMINAL = -100         # Negative reward associated with terminal states
 REVISIT_PENALTY = -99   # Extra penalty to be added to reward function for revisiting states
-TRAFFIC_LIGHT = -20     # Negative reward for traffic nodes
+TRAFFIC = -20     # Negative reward for traffic nodes
 
 
 
@@ -79,28 +83,6 @@ def generate_city(horizontal, vertical):
 
 
 
-########################## City Manipulation ####################################################
-
-def generate_traffic():
-    """
-    Function that generates procedurally generates traffic, according to 
-    All outer nodes are considered terminal states. Starting and End point, as well as routing,
-    must take place within.
-        Parameters:
-            grid_size: desired overall size of city
-            num_intersections: desired # of intersections
-            num_streets: desired number of streets
-        Returns:
-            G: Graph, representing city as a network of nodes and edges
-    """
-    
-    
-    return
-
-
-
-
-
 ########################## Initialization Functions  ####################################################
 
 def initialize_city():
@@ -123,8 +105,8 @@ def initialize_city():
     while vertical <= 3:
             vertical = int(input("Invalid city size. Please enter vertical dimension: "))
     print()
-    city = generate_city(horizontal, vertical)
-    return city
+    city, q_values = generate_city(horizontal, vertical)
+    return city, q_values
     
 
 def get_start(City):
@@ -136,7 +118,7 @@ def get_start(City):
             SP: Node name of starting point
     """
     # Remind user about invalid inputs
-    print("NOTE: Cannot user outer points as start or end, as they are reserved as " +
+    print("NOTE: Cannot use outer points as start or end, as they are reserved as " +
           "City perimeter. For example, (0, 0) is invalid. and for a city size of 7x7, " +
           "a starting point of (6, 6) is invalid.")
     # get city dimensions for error checking
@@ -181,6 +163,46 @@ def get_destination(City, SP):
 
 
 
+
+########################## City Manipulation ####################################################
+
+def generate_traffic(City):
+    """
+    Function that generates procedurally generates traffic, according to 
+    Function will consider the overall size of the city, to prevent causing unrealistic
+    over congestion. 
+    TO BE CALLED AFTER INITIALIZING CITY, STARTING PONIT, AND  DESTINATION.
+        Parameters:
+            City: city object on which to generate traffic
+        Returns:
+            None - function modifies existing city object
+    """
+    city_x, city_y = get_dimensions(City)
+    total_perimeter = city_x + city_y
+    # cases for city sizes
+    if total_perimeter <= 15:
+        __generate_traffic(City)
+        
+    elif total_perimeter <= 20:
+        __generate_traffic(City)
+        __generate_traffic(City)
+        
+    elif total_perimeter <= 30:
+        __generate_traffic(City)
+        __generate_traffic(City)
+        __generate_traffic(City)
+        
+    elif total_perimeter <= 50:
+        __generate_traffic(City)
+        __generate_traffic(City)
+        __generate_traffic(City)
+        __generate_traffic(City)
+    
+    return
+
+
+
+
 ########################## Helper functions  ####################################################
 
 def get_dimensions(City):
@@ -192,7 +214,7 @@ def get_dimensions(City):
             Horizontal: Horizontal length of city
             Vertical: Vertical length of City
     """
-    names = City.nodes()
+    names = get_nodes(City)
     horizontal = 0
     vertical = 0
     for name in names:
@@ -201,6 +223,7 @@ def get_dimensions(City):
             horizontal = X
         if Y > vertical:
             vertical = Y
+        # PREVIOUS VERSION:
         # if int(name[1]) > horizontal:
         #     horizontal = int(name[1])
         # if int(name[3]) > vertical:
@@ -254,6 +277,40 @@ def get_nodes(City):
     """
     nodes = City.nodes()
     return nodes
+
+def get_traffic_nodes(City):
+    """
+    Function that returns a list of all traffic nodes in a given city.
+    To be run after generating traffic with generate_traffic()
+        Parameters: 
+            City: City graph object created by generate_city()
+        Returns:
+            traffic_nodes: List of all traffic nodes
+    """
+    # Initialize traffic nodes, all nodes, and rewards
+    traffic_nodes = []
+    nodes = get_nodes(City)
+    rewards = get_rewards(City)
+    for node in nodes:
+        if rewards[node] == TRAFFIC:
+            traffic_nodes.append(node)
+    return traffic_nodes
+
+def get_random_node(City):
+    """
+    Function that returns a random node.
+        Parameters: 
+            City: City graph object created by generate_city()
+        Returns:
+            Nodes: List of all nodes in city
+    """
+    # various traffic depending on city size
+    city_x, city_y = get_dimensions(City)
+    rand_x = random.randint(1, city_x - 1)
+    rand_y = random.randint(1, city_y - 1)
+    random_node = current_node(rand_x, rand_y)
+
+    return random_node
 
 def current_node(horizontal, vertical):
     """
@@ -338,6 +395,26 @@ def current_xy(name):
         horizontal = horizontal
         vertical = vertical
     return int(horizontal), int(vertical)
+
+def __generate_traffic(City):
+    """
+    Private function that generates traffic for generate_traffic() function:
+        Parameters: 
+            City: city object  
+        Returns:
+            None: modifies existing city object
+    """
+    # Helper
+    rewards = get_rewards(City)
+    # Create random traffic starting point
+    traffic_node = get_random_node(City)
+    while rewards[traffic_node] != DEFAULT:
+        traffic_node = get_random_node(City)
+    # get neighbouring nodes to create congestion
+    traffic = nx.neighbors(City, traffic_node)
+    for node in traffic:
+        if rewards[node] == DEFAULT:
+            set_reward(City, node, TRAFFIC)
     
 
 
@@ -375,12 +452,16 @@ def print_start_end(City, SP, EP):
     """
     # Create custom positions for all nodes
     pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
+    # Traffic nodes
+    traffic = get_traffic_nodes(City)
     # color mapping
     def __node_color(node):
         if node == SP:
             return 'blue'
         elif node == EP:
-            return 'red' 
+            return 'red'
+        elif node in traffic:
+            return 'orange' 
         else:
             return 'lightblue'
     # create list of colors for nodes
@@ -405,6 +486,8 @@ def print_path(City, SP, EP, path):
     """
     # Create custom positions for all nodes
     pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
+    # Traffic nodes
+    traffic = get_traffic_nodes(City)
     # color mapping
     def __node_color(node):
         if node == SP:
@@ -413,6 +496,8 @@ def print_path(City, SP, EP, path):
             return 'red' 
         elif node in path:
             return 'green'
+        elif node in traffic:
+            return 'orange'
         else:
             return 'lightblue'
     # create list of colors for nodes
@@ -430,7 +515,7 @@ def print_path(City, SP, EP, path):
 ########################## TESTING  ####################################################
 
 def main():
-    city = generate_city(7, 7)
+    city, q_values = initialize_city()
     # print_city(city)
 
     # if is_terminal_state(city, "I1,1"):
@@ -448,6 +533,8 @@ def main():
     print()
     DP = get_destination(city, SP)
     print(DP)
+    generate_traffic(city)
+    print_start_end(city, SP, DP)
 
 if __name__ == '__main__':
     main()

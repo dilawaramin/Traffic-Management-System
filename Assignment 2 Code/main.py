@@ -23,13 +23,15 @@ def main():
     City, q_values = C.initialize_city()
     Start = C.get_start(City)
     Destination = C.get_destination(City, Start)
+    C.generate_traffic(City)
     
     # Initialize Q-Learning variables
     num_episodes, learning_rate, discount_factor, epsilon = Q.init_qlearn()
     
     # Show starting and end points on city map
     print("A pop up window will display your city layout, as well " +
-          "as starting and ending points.")
+          "as starting and ending points as blue and red, respectively. " +
+          "Traffic congestion is indicatedwith orange. ")
     os.system('pause')
     print()
     C.print_start_end(City, Start, Destination)
