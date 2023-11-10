@@ -23,7 +23,8 @@ def main():
     City, q_values = C.initialize_city()
     Start = C.get_start(City)
     Destination = C.get_destination(City, Start)
-    C.generate_traffic(City)
+    # C.generate_traffic(City)
+    C.generate_congestion(City)
     
     # Initialize Q-Learning variables
     ans = input("Would you like to set your own Q-Learning hyperparameters (Y/N)?\n")

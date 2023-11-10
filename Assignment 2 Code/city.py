@@ -24,13 +24,13 @@ import random
 
 ########################## GLOBAL VARIABLES ####################################################
 
-REWARD = 20            # Reward for goal
+REWARD = 20             # Reward for goal
 NEIGHBOURS = 20         # Reward for being close to goal (neighbouring nodes)
 VISITED = -50           # Negative reward for states that have already been visited
 DEFAULT = -1            # Default reward for regular states
 TERMINAL = -100         # Negative reward associated with terminal states
 REVISIT_PENALTY = -99   # Extra penalty to be added to reward function for revisiting states
-TRAFFIC = -20     # Negative reward for traffic nodes
+TRAFFIC = -10           # Negative reward for traffic nodes
 
 
 
@@ -124,10 +124,10 @@ def get_start(City):
     # get city dimensions for error checking
     x, y = get_dimensions(City)
     start_X = int(input("Enter X coordinate of starting point: "))
-    while start_X >= x or start_X <= 0:
+    while start_X >= x - 1 or start_X <= 0:
             start_X = int(input("Invalid input. Please enter Starting point X coordinate: "))
     start_Y = int(input("Enter Y coordinate of starting point: "))
-    while start_Y >= y or start_Y <= 0:
+    while start_Y >= y - 1 or start_Y <= 0:
             start_Y = int(input("Invalid input. Please enter Starting point Y coordinate: "))
     SP = current_node(start_X, start_Y)
     print()
@@ -147,10 +147,10 @@ def get_destination(City, SP):
     # parse starting point
     s, p = current_xy(SP)
     start_X = int(input("Enter X coordinate of Destination: "))
-    while start_X >= x or start_X <= 0:
+    while start_X >= x - 1 or start_X <= 0:
             start_X = int(input("Invalid input. Please enter Destination X coordinate: "))
     start_Y = int(input("Enter Y coordinate of Destination: "))
-    while start_Y >= y or start_Y <= 0:
+    while start_Y >= y - 1 or start_Y <= 0:
             start_Y = int(input("Invalid input. Please enter Destination Y coordinate: "))
     DP = current_node(start_X, start_Y)
     if start_X == s and start_Y == p:
@@ -166,9 +166,9 @@ def get_destination(City, SP):
 
 ########################## City Manipulation ####################################################
 
-def generate_traffic(City):
+def generate_congestion(City):
     """
-    Function that generates procedurally generates traffic, according to 
+    Function that generates procedurally generates traffic congestion, according to 
     Function will consider the overall size of the city, to prevent causing unrealistic
     over congestion. 
     TO BE CALLED AFTER INITIALIZING CITY, STARTING PONIT, AND  DESTINATION.
@@ -180,7 +180,39 @@ def generate_traffic(City):
     city_x, city_y = get_dimensions(City)
     total_perimeter = city_x + city_y
     # cases for city sizes
-    # 2 spots of congestion for a city 15x15 or smaller
+    # 2 spots of congestion for a city 7x7 or smaller
+    if total_perimeter <= 14:
+        for i in range(1):
+            __generate_congestion(City)
+    # 4 spots of congestion for a city 10x10 or smaller
+    elif total_perimeter <= 20:
+        for i in range(3):
+            __generate_congestion(City)
+    # 7 spots of congestion for a city 15x15 or smaller
+    elif total_perimeter <= 30:
+        for i in range (6):
+            __generate_congestion(City)
+    # 9 spots of congestion for a city 25x25 or smaller
+    elif total_perimeter <= 50:
+        for i in range(8):
+            __generate_congestion(City)
+            
+    return
+
+def generate_traffic(City):
+    """
+    Function that generates random nodes of traffic in city
+    TO BE CALLED AFTER INITIALIZING CITY, STARTING PONIT, AND  DESTINATION.
+        Parameters:
+            City: city object on which to generate traffic
+        Returns:
+            None - function modifies existing city object
+    """
+    city_x, city_y = get_dimensions(City)
+    total_perimeter = city_x + city_y
+    rewards = get_rewards(City)
+    # Get coordinates of a random node
+    traffic = get_random_node(City)
     if total_perimeter <= 15:
         for i in range(1):
             __generate_traffic(City)
@@ -196,7 +228,8 @@ def generate_traffic(City):
     elif total_perimeter <= 50:
         for i in range(8):
             __generate_traffic(City)
-            
+    
+    
     return
 
 
@@ -280,7 +313,7 @@ def get_nodes(City):
 def get_traffic_nodes(City):
     """
     Function that returns a list of all traffic nodes in a given city.
-    To be run after generating traffic with generate_traffic()
+    Note: To be run after generating traffic with generate_congestion()
         Parameters: 
             City: City graph object created by generate_city()
         Returns:
@@ -395,9 +428,9 @@ def current_xy(name):
         vertical = vertical
     return int(horizontal), int(vertical)
 
-def __generate_traffic(City):
+def __generate_congestion(City):
     """
-    Private function that generates traffic for generate_traffic() function:
+    Private function that generates traffic for generate_congestion() function:
         Parameters: 
             City: city object  
         Returns:
@@ -419,7 +452,23 @@ def __generate_traffic(City):
         if rewards[node] == DEFAULT:
             set_reward(City, node, TRAFFIC)
     return
-    
+
+def __generate_traffic(City):
+    """
+    Private function that generates traffic nodes for generate_traffic() function:
+        Parameters: 
+            City: city object  
+        Returns:
+            None: modifies existing city object
+    """
+    # Helper
+    rewards = get_rewards(City)
+    # Create random traffic node
+    traffic_node = get_random_node(City)
+    while rewards[traffic_node] != DEFAULT:
+        traffic_node = get_random_node(City)
+    set_reward(City, traffic_node, TRAFFIC)
+    return
 
 
 
@@ -537,7 +586,7 @@ def main():
     print()
     DP = get_destination(city, SP)
     print(DP)
-    generate_traffic(city)
+    generate_congestion(city)
     print_start_end(city, SP, DP)
     nodes = city.nodes()
     print(nodes)
