@@ -17,14 +17,21 @@ import time
 
 
 
-def main():
-    
-    # Initialize city, starting point, and destination
+########################## Program Function  ####################################################
+
+def run_q_learning():
+    """
+    This function calls all initialization functions, and then proceeds to run Q-Learning
+        Parameters:
+            None
+        Returns:
+            None 
+    """
+    # Initialize city, starting point, destination, and traffic
     City, q_values = C.initialize_city()
     Start = C.get_start(City)
     Destination = C.get_destination(City, Start)
-    # C.generate_traffic(City)
-    C.generate_congestion(City)
+    C.initialize_traffic(City)
     
     # Initialize Q-Learning variables
     ans = input("Would you like to set your own Q-Learning hyperparameters (Y/N)?\n")
@@ -38,7 +45,7 @@ def main():
     # Show starting and end points on city map
     print("A pop up window will display your city layout, as well " +
           "as starting and ending points as blue and red, respectively. " +
-          "Traffic congestion is indicated with orange. ")
+          "Traffic congestion is indicated with orange. \n")
     os.system('pause')
     print()
     C.print_start_end(City, Start, Destination)
@@ -58,7 +65,39 @@ def main():
     os.system('pause')
     Q.visualize_path(q_values, City, Start, Destination)
     print()
+    return
+
+def repeat():
+    """
+    Function to get input from user to repeat program
+        Parameters:
+            None
+        Returns:
+            Again: User input for running program again or not
+    """
+    choices = ['q', 'r']
+    again = input("\nWould you like to run the program again (Q to quit, R to repeat)? ")
+    while again.lower() not in choices:
+        again = input("\nInvalid input. Quit or Repeat (Q/R)? ")
+    return again.lower()
+
+
+
+
+########################## MAIN  ####################################################
+
+def main():
     
+    # Run the program initially 
+    print("Welcome! Let's get started.\n")
+    run_q_learning()
+    
+    # Ask to repeat or quit
+    again = repeat()
+    while again == 'r':
+        run_q_learning()
+        again = repeat()
+    print("\nThank you for trying out our Q-Learning demonstration. Goodbye!\n")
     
     
 if __name__ == '__main__':

@@ -97,13 +97,17 @@ def initialize_city():
           "to coordinates starting at (0, 0). Outter edge of city is used as a terminal "
           + "state perimeter. We do not recommend a city size of greater than 15x15, for " +
           "performance related reasons. Minimum allowed city size is 4x4, which translates" +
-           "to a 2x2 useable grid.\n")
-    horizontal = int(input("Please enter horizontal dimension of city: "))
+           "to a 2x2 useable grid. NOTE: Program not optimized for overly rectangular cities.\n")
+    print("Please enter horizontal dimension of city (integers only): ")
+    horizontal = __get_input_int()
     while horizontal <= 3:
-            horizontal = int(input("Invalid city size. Please enter horizontal dimension: "))
-    vertical = int(input("Please enter vertical dimension of city: "))
+            print("Invalid input.")
+            horizontal = __get_input_int()
+    print("Please enter vertical dimension of city: ")
+    vertical = __get_input_int()
     while vertical <= 3:
-            vertical = int(input("Invalid city size. Please enter vertical dimension: "))
+            print("Invalid input.")
+            vertical = __get_input_int
     print()
     city, q_values = generate_city(horizontal, vertical)
     return city, q_values
@@ -123,12 +127,16 @@ def get_start(City):
           "a starting point of (6, 6) is invalid.\n")
     # get city dimensions for error checking
     x, y = get_dimensions(City)
-    start_X = int(input("Enter X coordinate of starting point: "))
+    print("Enter X coordinate of starting point: ")
+    start_X = __get_input_int()
     while start_X >= x - 1 or start_X <= 0:
-            start_X = int(input("Invalid input. Please enter Starting point X coordinate: "))
-    start_Y = int(input("Enter Y coordinate of starting point: "))
+            print("Invalid input.")
+            start_X = __get_input_int
+    print("Enter Y coordinate of starting point: ")
+    start_Y = __get_input_int()
     while start_Y >= y - 1 or start_Y <= 0:
-            start_Y = int(input("Invalid input. Please enter Starting point Y coordinate: "))
+            print("Invalid input.")
+            start_Y = __get_input_int
     SP = current_node(start_X, start_Y)
     print()
     return SP
@@ -146,12 +154,16 @@ def get_destination(City, SP):
     x, y = get_dimensions(City)
     # parse starting point
     s, p = current_xy(SP)
-    start_X = int(input("Enter X coordinate of Destination: "))
+    print("Enter X coordinate of Destination: ")
+    start_X = __get_input_int()
     while start_X >= x - 1 or start_X <= 0:
-            start_X = int(input("Invalid input. Please enter Destination X coordinate: "))
-    start_Y = int(input("Enter Y coordinate of Destination: "))
+            print("Invalid input.")
+            start_X = __get_input_int()
+    print("Enter Y coordinate of Destination: ")
+    start_Y = __get_input_int()
     while start_Y >= y - 1 or start_Y <= 0:
-            start_Y = int(input("Invalid input. Please enter Destination Y coordinate: "))
+            print("Invalid input.")
+            start_Y = __get_input_int()
     DP = current_node(start_X, start_Y)
     if start_X == s and start_Y == p:
         print("Destination cannot be the same as starting point!!!")
@@ -161,6 +173,42 @@ def get_destination(City, SP):
     print()
     return DP
 
+def initialize_traffic(City):
+    """
+    Function that initializes city traffic level via user inputs.
+        Parameters:
+            City: city object on which to generate traffic
+        Returns:
+            None - function modifies existing city object
+    """
+    choices = ['n', 'l', 'm', 'h']
+    message = """\nWhat level of traffic would you like in the city?
+    Input:
+    N for None
+    L for Light
+    M for Medium
+    H for Heavy
+    
+    """
+    choice = input(message)
+    while choice.lower() not in choices:
+        choice = input("Invalid Input! " + message)
+    choice = choice.lower()
+    # various cases for overall traffic level
+    if choice == 'n':
+        print("No traffic!\n")
+    elif choice == 'l':
+        generate_traffic(City)
+        print("Light traffic!\n")
+    elif choice == 'm':
+        generate_congestion(City)
+        print("Medium Traffic!\n")
+    else:
+        generate_traffic(City)
+        generate_congestion(City)
+        print("Heavy traffic!\n")
+    return
+        
 
 
 
@@ -470,6 +518,25 @@ def __generate_traffic(City):
     set_reward(City, traffic_node, TRAFFIC)
     return
 
+def __get_input_int():
+    """
+    Private helper function that obtains a valid integer input 
+        Parameters: 
+            None:  
+        Returns:
+            n: Integer inputed from user
+    """
+    n = None
+    while True:
+        n = input("\nInput: ")
+        try:
+            n = int(n)
+            break
+        except ValueError:
+            print("Invalid Input!")
+    return n
+        
+
 
 
 ########################## Auxiliary print functions ####################################################
@@ -581,16 +648,17 @@ def main():
     # print_city(city)
     # set_destination(city, "I3,3")
     # print_city(city)
-    SP = get_start(city)
-    print(SP)
-    print()
-    DP = get_destination(city, SP)
-    print(DP)
-    generate_congestion(city)
-    print_start_end(city, SP, DP)
-    nodes = city.nodes()
-    print(nodes)
-    print(type(nodes))
+    # SP = get_start(city)
+    # print(SP)
+    # print()
+    # DP = get_destination(city, SP)
+    # print(DP)
+    # generate_congestion(city)
+    # print_start_end(city, SP, DP)
+    # nodes = city.nodes()
+    # print(nodes)
+    # print(type(nodes))
+    print_city(city)
 
 if __name__ == '__main__':
     main()

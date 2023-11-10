@@ -1,7 +1,8 @@
 
-name = "I3,3"
-name = name[1:]
-x, y = name.split(',')
-x = int(x)
-y = int(y)
-
+while True:
+    n = input("numerator")
+    try:
+        n = int(n)
+        break
+    except ValueError:
+        print("input numbers please ")
