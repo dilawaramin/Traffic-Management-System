@@ -1,9 +1,10 @@
 """
-Q Learning algorithm for traffic management system.
-Use city objects from city.py
-
 Author: Dilawar Amin
 Date: 11/05/2023
+
+Q Learning algorithm for traffic management system. Contains all functions that are
+directly related to running the main Q learning algorithm.
+Uses city objects and helper functions from city.py
 """
 # Import city, to create and print cities
 import city as C
