@@ -77,7 +77,7 @@ def repeat():
             Again: User input for running program again or not
     """
     choices = ['q', 'r']
-    again = input("\nWould you like to run the program again (Q to quit, R to repeat)? ")
+    again = input("Would you like to run the program again (Q to quit, R to repeat)? ")
     while again.lower() not in choices:
         again = input("\nInvalid input. Quit or Repeat (Q/R)? ")
     return again.lower()
