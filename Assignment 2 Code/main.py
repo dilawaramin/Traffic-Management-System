@@ -62,6 +62,7 @@ def run_q_learning():
     
     # Show what the agent learned
     print("The agent has learned the following route (A separate window will open):")
+    print("NOTE: you may need to scale up the window for larger city sizes\n")
     os.system('pause')
     Q.visualize_path(q_values, City, Start, Destination)
     print()
