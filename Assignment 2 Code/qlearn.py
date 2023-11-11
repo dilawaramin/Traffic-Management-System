@@ -6,6 +6,9 @@ Q Learning algorithm for traffic management system. Contains all functions that 
 directly related to running the main Q learning algorithm.
 Uses city objects and helper functions from city.py
 """
+
+########################## IMPORTS ####################################################
+
 # Import city, to create and print cities
 import city as C
 import numpy as np

@@ -22,7 +22,6 @@ import random
 
 
 
-
 ########################## GLOBAL VARIABLES ####################################################
 
 REWARD = 20             # Reward for goal

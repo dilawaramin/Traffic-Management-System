@@ -14,6 +14,9 @@ Ensure they are installed by using:
 
 Ensure they are installed and operational before running the program.
 """
+
+########################## IMPORTS ####################################################
+
 import qlearn as Q
 import city as C 
 import os
