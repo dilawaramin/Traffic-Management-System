@@ -203,7 +203,7 @@ def initialize_traffic(City):
     elif choice == 'm':
         generate_congestion(City)
         print("Medium Traffic!\n")
-    else:
+    elif choice == 'h':
         generate_traffic(City)
         generate_congestion(City)
         print("Heavy traffic!\n")
@@ -244,6 +244,10 @@ def generate_congestion(City):
     elif total_perimeter <= 50:
         for i in range(8):
             __generate_congestion(City)
+    # 15 spots of congestion for 30x30 and up
+    elif total_perimeter >= 60:
+        for i in range(14):
+            __generate_congestion(City)
             
     return
 
@@ -276,7 +280,10 @@ def generate_traffic(City):
     elif total_perimeter <= 50:
         for i in range(8):
             __generate_traffic(City)
-    
+    # 15 spots of congestion for 30x30 and up
+    elif total_perimeter >= 60:
+        for i in range(14):
+            __generate_traffic(City)
     
     return
 
@@ -358,6 +365,22 @@ def get_nodes(City):
     nodes = City.nodes()
     return nodes
 
+def get_perimeter_nodes(City):
+    """
+    Function that returns a list of all nodes in the perimeter of city (terminal states)
+        Parameters: 
+            City: City graph object created by generate_city()
+        Returns:
+            Nodes: List of all nodes in city
+    """
+    nodes = City.nodes()
+    rewards = get_rewards(City)
+    perimeter = []
+    for node in nodes:
+        if rewards[node] == TERMINAL:
+            perimeter.append(node)
+    return perimeter
+
 def get_traffic_nodes(City):
     """
     Function that returns a list of all traffic nodes in a given city.
@@ -403,24 +426,6 @@ def current_node(horizontal, vertical):
     """
     name = f"I{horizontal},{vertical}"
     return name
-
-def SET_ASIDE_current_xy(name):     # set aside while testing V.2 of this function
-    """
-    Function that returns returns x and y position of the current node
-        Parameters: 
-            name: Name of current node   
-        Returns:
-            Horizontal: Current horizontal index
-            Vertical: Current vertical index
-    """
-    # make sure name is valid
-    if len(name) < 3:
-        print("\nInvalid name")
-        return
-    else:
-        horizontal = name[1]
-        vertical = name[3]
-    return int(horizontal), int(vertical)
 
 def set_destination(City, DP):
     """
@@ -475,6 +480,11 @@ def current_xy(name):
         horizontal = horizontal
         vertical = vertical
     return int(horizontal), int(vertical)
+
+
+
+
+########################## Private Helpers  ####################################################
 
 def __generate_congestion(City):
     """
@@ -534,6 +544,26 @@ def __get_input_int():
             break
         except ValueError:
             print("Invalid Input!")
+    print()
+    return n
+       
+def __get_input_float():
+    """
+    Private helper function that obtains a valid float input 
+        Parameters: 
+            None:  
+        Returns:
+            n: floating point number inputed from user
+    """
+    n = None
+    while True:
+        n = input("\nInput: ")
+        try:
+            n = float(n)
+            break
+        except ValueError:
+            print("Invalid Input!")
+    print()
     return n
         
 
@@ -553,7 +583,7 @@ def print_city(City):
     pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
     # Formatting for the graph that is to be shown
     labels = nx.get_node_attributes(City, 'reward')
-    nx.draw(City, pos, labels=labels, node_size=200, node_color='lightblue', edge_color='gray', font_size=8, font_color='black')
+    nx.draw(City, pos, labels=labels, node_size=200, node_color='lightblue', edge_color='gray', font_size=8, font_color='black', width=5)
     # Show the city graph
     plt.show()
     
@@ -574,6 +604,8 @@ def print_start_end(City, SP, EP):
     pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
     # Traffic nodes
     traffic = get_traffic_nodes(City)
+    # perimeter nodes
+    perimeter = get_perimeter_nodes(City)
     # color mapping
     def __node_color(node):
         if node == SP:
@@ -582,12 +614,14 @@ def print_start_end(City, SP, EP):
             return 'red'
         elif node in traffic:
             return 'orange' 
+        elif node in perimeter:
+            return 'black'
         else:
             return 'lightblue'
     # create list of colors for nodes
     node_colors = [__node_color(node) for node in City.nodes()]
     # Formatting for the graph that is to be shown
-    nx.draw(City, pos, with_labels=True, node_size=200, node_color=node_colors, edge_color='gray', font_size=8, font_color='black')
+    nx.draw(City, pos, with_labels=True, node_size=200, node_color=node_colors, edge_color='gray', font_size=8, font_color='black', width=5)
     # Show the city graph
     plt.show()
 
@@ -608,6 +642,12 @@ def print_path(City, SP, EP, path):
     pos = {node: (City.nodes[node]['pos'][0], City.nodes[node]['pos'][1]) for node in City.nodes}
     # Traffic nodes
     traffic = get_traffic_nodes(City)
+    # perimeter nodes
+    perimeter = get_perimeter_nodes(City)
+    # edge colors
+    path_edges = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
+    path_edges.append((path[-1], EP))
+    edge_colors = ['green' if edge in path_edges or (edge[1], edge[0]) in path_edges else 'gray' for edge in City.edges()]
     # color mapping
     def __node_color(node):
         if node == SP:
@@ -618,12 +658,14 @@ def print_path(City, SP, EP, path):
             return 'green'
         elif node in traffic:
             return 'orange'
+        elif node in perimeter:
+            return 'black'
         else:
             return 'lightblue'
     # create list of colors for nodes
     node_colors = [__node_color(node) for node in City.nodes()]
     # Formatting for the graph that is to be shown
-    nx.draw(City, pos, with_labels=True, node_size=200, node_color=node_colors, edge_color='gray', font_size=8, font_color='black')
+    nx.draw(City, pos, with_labels=True, node_size=200, node_color=node_colors, edge_color=edge_colors, font_size=8, font_color='black', width=5)
     # Show the city graph
     plt.show()
 

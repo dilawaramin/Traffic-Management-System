@@ -32,11 +32,37 @@ def init_qlearn():
             exploration_prob: How often to make random moves, encouraging exploration v.s. exploitation
             
     """
+    def _not0or1(bad):
+        """
+        Private helper that ensures values between 0 and 1
+        Parameters:
+            None
+        Returns:
+            f: floating point number between 0 and 1
+        """
+        while (bad > 0 and bad <= 1) != True:
+            print("Invalid Input (Must select a number between 0 and 1). ")
+            bad = C.__get_input_float()
+        return bad
+    
     print("Lets initialize some important values for our Q-Learning algorithm.\n")
-    num_episodes = int(input("Episodes: The number of training episodes you wish to run (Suggested: 1000): "))
-    learning_rate = float(input("Learning Rate: Controls how quickly the agent learns (Suggested: 0.9): "))
-    discount_factor = float(input("Discount: Weighs immediate v.s. future rewards (Suggested: 0.9): "))
-    epsilon = float(input("Exploration: Rate at which to Balance exploration v.s. exploitation (Suggested: 0.9): "))
+    print("Episodes: The number of training episodes you wish to run. (Suggested: 1000 for city sizes under 10x10" +
+          " and 3000-5000 for larger sized cities.): ")
+    num_episodes = C.__get_input_int()
+    
+    print("Learning Rate: Controls how quickly the agent learns. Must choose value between 0 - 1 (Suggested: 0.9): ")
+    learning_rate = C.__get_input_float()
+    _not0or1(learning_rate)
+    
+    print("Discount: Weighs immediate v.s. future rewards. Must choose value between 0 - 1 (Suggested: 0.9): ")
+    discount_factor = C.__get_input_float()
+    _not0or1(discount_factor)
+    
+    print("Exploration: Rate at which to Balance exploration v.s. exploitation. Must choose value between 0 - 1. " +
+          "Use a lower value on larger city, to allow for ample exploration. (Suggested: 0.9): ")
+    epsilon = C.__get_input_float()
+    _not0or1(epsilon)
+    
     print()
     return num_episodes, learning_rate, discount_factor, epsilon
 
@@ -122,8 +148,16 @@ def visualize_path(q_values, city, start, end):
     # initialize starting node and path
     current_node = start
     path = [start]
-    #print(start)
+    # initialize failure counter
+    counter = 0
+    x, y = C.get_dimensions(city)
+    perimeter = x + y
     while C.is_terminal_state(city, current_node) != True:
+        # ensure loop is not infinite
+        if counter > perimeter * 2:
+            print("Agent was unable to learn a path to destination, please" +
+                  " try adjusting Q-Learning hyperparameters.")
+            return
         curr_x, curr_y = C.current_xy(current_node)
         # Use q values to find best action and make move
         action = np.argmax(q_values[curr_x, curr_y])
@@ -132,6 +166,7 @@ def visualize_path(q_values, city, start, end):
         current_node = C.current_node(new_x, new_y)
         #print(f"New Node: H:{new_x}, V:{new_y}\n")
         path.append(current_node)
+        counter += 1
     # call function in city.py to create visual graph
     C.print_path(city, start, end, path)
     # i think thats it
