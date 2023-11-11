@@ -1,6 +1,6 @@
 """
-Author:     Dilawar Amin
-Date:       11/05/2023
+Author:         Dilawar Amin
+Date Created:   11/05/2023
 
 Q Learning algorithm for traffic management system. Uses city.py to generate a city, and 
 runs/trains algorithm from qlearn.py. 

@@ -1,6 +1,6 @@
 """
-Author: Dilawar Amin
-Date: 11/05/2023
+Author:         Dilawar Amin
+Date Created:   11/05/2023
 
 Q Learning algorithm for traffic management system. Contains all functions that are
 directly related to running the main Q learning algorithm.
