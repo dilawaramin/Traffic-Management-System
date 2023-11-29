@@ -47,7 +47,8 @@ def generate_city(horizontal, vertical):
             num_intersections: desired # of intersections
             num_streets: desired number of streets
         Returns:
-            G: Graph, representing city as a network of nodes and edges
+            City: Graph object, representing city as a network of nodes and edges
+            q_values: Q table initialized to 0
     """
     # Initialize Graph object
     City = nx.Graph()
@@ -665,7 +666,7 @@ def print_path(City, SP, EP, path):
     # create list of colors for nodes
     node_colors = [__node_color(node) for node in City.nodes()]
     # Formatting for the graph that is to be shown
-    nx.draw(City, pos, with_labels=True, node_size=200, node_color=node_colors, edge_color=edge_colors, font_size=8, font_color='black', width=5)
+    nx.draw(City, pos, with_labels=False, node_size=200, node_color=node_colors, edge_color=edge_colors, font_size=8, font_color='black', width=5)
     # Show the city graph
     plt.show()
 
