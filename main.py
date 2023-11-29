@@ -18,14 +18,47 @@ Ensure they are installed and operational before running the program.
 ########################## IMPORTS ####################################################
 
 import qlearn as Q
+import BFS
+import Astar
 import city as C 
 import os
 import time
 
 
-
-
 ########################## Program Function  ####################################################
+
+def run_astar():
+    """
+    This function calls all initialization functions, and then proceeds to run A* Search
+    """
+    City, q_values = C.initialize_city()
+    Start = C.get_start(City)
+    Destination = C.get_destination(City, Start)
+    C.initialize_traffic(City)
+    
+    # Show starting and end points on city map
+    C.print_start_end(City, Start, Destination)
+    
+    # Run A* Search
+    print("Beginning A* search!")
+    Astar.astar_search(City, Start, Destination)
+
+def run_bfs():
+    """
+    This function calls all initialization functions, and then proceeds to run DFS
+    """
+    # Initialization similar to run_q_learning
+    City, q_values = C.initialize_city()
+    Start = C.get_start(City)
+    Destination = C.get_destination(City, Start)
+    C.initialize_traffic(City)
+    
+    # Show starting and end points on city map
+    C.print_start_end(City, Start, Destination)
+    
+    # Run DFS
+    print("Beginning DFS search!")
+    BFS.bfs_search(City, Start, Destination)
 
 def run_q_learning():
     """
@@ -99,19 +132,37 @@ def main():
     
     # Run the program initially 
     print("Welcome! Let's get started.\n")
-    run_q_learning()
+    choice = input("Choose the algorithm to solve the problem (Q for Q-Learning, B for BFS, , A for A*): ").lower()
+
+    while choice not in ('q', 'b', 'a'):
+        choice = input("Invalid input. Choose 'Q' for Q-Learning, 'B' for BFS, or 'A' for A*: ").lower()
+
+    if choice == 'q':
+        run_q_learning()
+    elif choice == 'b':
+        run_bfs()
+    elif choice == 'a':
+        run_astar()
     
     # Ask to repeat or quit
     again = repeat()
+
     while again == 'r':
-        run_q_learning()
-        again = repeat()
+        choice = input("Choose the algorithm to solve the problem (Q for Q-Learning, B for BFS, , A for A*): ").lower()
+        if choice == 'q':
+            run_q_learning()
+        elif choice == 'b':
+            run_bfs()
+        elif choice == 'a':
+            run_astar()
+
+    while choice not in ('q', 'b', 'a'):
+        choice = input("Invalid input. Choose 'Q' for Q-Learning, 'B' for BFS, or 'A' for A*: ").lower()
+
+
     print("\nThank you for trying out our Q-Learning demonstration. Goodbye!\n")
     
     
 if __name__ == '__main__':
     main()
     print("Program Terminated")
-
-
-        
