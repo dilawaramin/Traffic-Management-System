@@ -1,5 +1,3 @@
-# Astar.py
-
 """
 Author:         Shane Shamku
 Date Created:   11/27/2023
