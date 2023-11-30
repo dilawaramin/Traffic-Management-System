@@ -9,11 +9,17 @@ directly related to running the main A* algorithm.
 Uses city objects and helper functions from city.py
 """
 
+########################## IMPORTS ####################################################
 
 import numpy as np
 import heapq
 import city as C
 import time
+
+
+
+
+########################## A* AND HELPER ####################################################
 
 def heuristic(node, goal):
     """
@@ -67,6 +73,11 @@ def astar_search(city, start, end):
     print("No path found.")
     print_path_and_metrics(city, start, end, [], start_time, end_time, visited)
     return []
+
+
+
+
+########################## PRINT FUNCTION ####################################################
 
 def print_path_and_metrics(city, start, end, path, start_time, end_time, visited):
     """

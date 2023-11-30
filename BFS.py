@@ -1,7 +1,5 @@
-# BFS.py
-
 """
-Author:         Dilawar Amin
+Author:         Javier Rodrigues
 Date Created:   11/05/2023
 
 BFS Search algorithm for traffic management system. Contains all functions that are
@@ -9,9 +7,16 @@ directly related to running the main BFS algorithm.
 Uses city objects and helper functions from city.py
 """
 
+########################## IMPORTS ####################################################
+
 import city as C
 import time
 from collections import deque
+
+
+
+
+########################## BFS ALGORITHM ####################################################
 
 def bfs_search(city, start, end):
     """
@@ -47,6 +52,11 @@ def bfs_search(city, start, end):
 
     print_path_and_metrics(city, start, end, path, start_time, end_time, visited)
     return path
+
+
+
+
+########################## PRINT FUNCTION ####################################################
 
 def print_path_and_metrics(city, start, end, path, start_time, end_time, visited):
     """

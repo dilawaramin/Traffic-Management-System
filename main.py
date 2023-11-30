@@ -25,6 +25,8 @@ import os
 import time
 
 
+
+
 ########################## Program Function  ####################################################
 
 def run_astar():
@@ -151,10 +153,13 @@ def main():
         choice = input("Choose the algorithm to solve the problem (Q for Q-Learning, B for BFS, , A for A*): ").lower()
         if choice == 'q':
             run_q_learning()
+            again = repeat()
         elif choice == 'b':
             run_bfs()
+            again = repeat()
         elif choice == 'a':
             run_astar()
+            again = repeat()
 
     while choice not in ('q', 'b', 'a'):
         choice = input("Invalid input. Choose 'Q' for Q-Learning, 'B' for BFS, or 'A' for A*: ").lower()
