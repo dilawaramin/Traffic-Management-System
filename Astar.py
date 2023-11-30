@@ -27,6 +27,7 @@ def heuristic(node, goal):
     x2, y2 = C.current_xy(goal)
     return abs(x1 - x2) + abs(y1 - y2)
 
+
 def astar_search(city, start, end):
     """
     Perform A* search on the city graph from start to end node.

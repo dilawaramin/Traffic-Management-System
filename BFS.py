@@ -49,9 +49,12 @@ def bfs_search(city, start, end):
                     queue.append((neighbor, current_path + [neighbor]))
     
     end_time = time.time()
-
-    print_path_and_metrics(city, start, end, path, start_time, end_time, visited)
-    return path
+    if not path:
+        print("BFS FAILED TO FIND PATH.")
+        return
+    else:
+        print_path_and_metrics(city, start, end, path, start_time, end_time, visited)
+        return path
 
 
 
