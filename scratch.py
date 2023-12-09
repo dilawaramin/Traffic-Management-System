@@ -1,10 +1,6 @@
 # testing random things
 
 
-while True:
-    n = input("numerator")
-    try:
-        n = int(n)
-        break
-    except ValueError:
-        print("input numbers please ")
+
+for i in range(0, 100, 0.001):
+    print(i)

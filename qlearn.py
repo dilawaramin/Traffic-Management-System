@@ -13,6 +13,7 @@ Uses city objects and helper functions from city.py
 import city as C
 import numpy as np
 import copy
+import time
 
 # Global Variables
 # actions
@@ -255,6 +256,46 @@ def q_learning(city, start_node, end_node, num_episodes, learning_rate, discount
 
 
 ########################## AUXILIARY FUNCTIONS ####################################################
+
+def qlearn_timed(q_values, city, start, end):
+    """
+    Function that takes final Q-values and routes the agent, for perfomance comparisons and metrics.
+            q_values: Q-table, make sure to train agent before hand
+        Returns:
+            None
+    """
+    # initialize starting node and path
+    current_node = start
+    path = [start]
+    # initialize failure counter
+    counter = 0
+    x, y = C.get_dimensions(city)
+    perimeter = x + y
+    # get start time
+    timeStart = time.time()
+    while C.is_terminal_state(city, current_node) != True:
+        # ensure loop is not infinite
+        if counter > perimeter * 2:
+            print("Agent was unable to learn a path to destination, please" +
+                  " try adjusting Q-Learning hyperparameters.")
+            return
+        curr_x, curr_y = C.current_xy(current_node)
+        # Use q values to find best action and make move
+        action = np.argmax(q_values[curr_x, curr_y])
+        #print(f"H:{curr_x}, V:{curr_y}, A:{actions[action]}")
+        new_x, new_y = get_next_location(city, curr_x, curr_y, action)
+        current_node = C.current_node(new_x, new_y)
+        #print(f"New Node: H:{new_x}, V:{new_y}\n")
+        path.append(current_node)
+        counter += 1
+    # get end time, print total
+    timeEnd = time.time()
+    tam = timeEnd - timeStart
+    print(f"Agent determined a route using Q-values in {tam:.4} seconds.\n")
+    # call function in city.py to create visual graph
+    C.print_path(city, start, end, path)
+    # i think thats it
+    return
 
 
 
