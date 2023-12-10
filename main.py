@@ -57,18 +57,23 @@ def main():
     
     # Ask to repeat or quit
     again = EXE.repeat()
+    # recreate city or reuse
+    EXE.repeat_city(city, q_values, SP, DP)
 
     while again == 'r':
         choice = input("\nChoose the algorithm to solve the problem (Q for Q-Learning, B for BFS, A for A*): ").lower()
         if choice == 'q':
             EXE.run_q_learning(city, q_values, SP, DP)
             again = EXE.repeat()
+            EXE.repeat_city(city, q_values, SP, DP)
         elif choice == 'b':
             EXE.run_bfs(city, SP, DP)
             again = EXE.repeat()
+            EXE.repeat_city(city, q_values, SP, DP)
         elif choice == 'a':
             EXE.run_astar(city, SP, DP)
             again = EXE.repeat()
+            EXE.repeat_city(city, q_values, SP, DP)
 
     while choice not in ('q', 'b', 'a'):
         choice = input("Invalid input. Choose 'Q' for Q-Learning, 'B' for BFS, or 'A' for A*: ").lower()

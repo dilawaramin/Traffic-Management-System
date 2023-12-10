@@ -143,3 +143,22 @@ def repeat():
         again = input("\nInvalid input. Quit or Repeat (Q/R)? ")
     return again.lower()
 
+
+def repeat_city(city, q_values, SP, DP):
+    """
+    Function to get input from user to create a new city or not
+        Parameters:
+            None
+        Returns:
+            Again: User input for running program again or not
+    """
+    choice = input("Would you like to create a new city or reuse the current one? (N = New, R = Reuse): ")
+    while choice.lower() not in ('r, n'):
+        choice = input("\nInvalid input. New or Reuse (N/R)? ")
+    if choice.lower() == 'r':
+        print("You have selected to reuse the current city!\n")
+        return city, q_values, SP, DP
+    elif choice.lower() == 'n':
+        print("You have chosen to create a new city!\n")
+        city, q_values, SP, DP = init_city_run()
+        return city, q_values, SP, DP
