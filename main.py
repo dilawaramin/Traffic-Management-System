@@ -44,7 +44,8 @@ def main():
     city, q_values, SP, DP = EXE.init_city_run()
     
     # Run algorithm on the
-    choice = input("Choose the algorithm you wish to use to find route (Q for Q-Learning, B for BFS, A for A*): ").lower()
+    print("NOTE: There are known issues that will occasionally appear with the BFS algorithm.\n")   # NOTE: BFS disclaimer
+    choice = input("Choose the algorithm you wish to use to find route. (Q for Q-Learning, B for BFS, A for A*): ").lower()
     while choice not in ('q', 'b', 'a'):
         choice = input("Invalid input. Choose 'Q' for Q-Learning, 'B' for BFS, or 'A' for A*: ").lower()
     # Run requested algorithm
