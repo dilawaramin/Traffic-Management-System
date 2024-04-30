@@ -9,9 +9,9 @@ an A* Heuristic search aglorithm, for testing and comparison purposes.
 NOTE: NetworkX, matplotlib.pyplot, and numpy are required for this program to run
 Ensure they are installed by using: 
 
-"pip install networkx"
-"pip install matplotlib"
-"pip install numpy"
+    "pip install networkx"
+    "pip install matplotlib"
+    "pip install numpy"
 
 Ensure they are installed and operational before running the program.
 """

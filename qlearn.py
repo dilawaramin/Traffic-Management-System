@@ -275,10 +275,13 @@ def qlearn_timed(q_values, city, start, end):
     timeStart = time.time()
     while C.is_terminal_state(city, current_node) != True:
         # ensure loop is not infinite
-        if counter > perimeter * 2:
-            print("Agent was unable to learn a path to destination, please" +
-                  " try adjusting Q-Learning hyperparameters.")
-            return
+        
+        # commented out for performance
+        
+        # if counter > perimeter * 2:
+        #     print("Agent was unable to learn a path to destination, please" +
+        #           " try adjusting Q-Learning hyperparameters.")
+        #     return
         curr_x, curr_y = C.current_xy(current_node)
         # Use q values to find best action and make move
         action = np.argmax(q_values[curr_x, curr_y])
@@ -287,11 +290,14 @@ def qlearn_timed(q_values, city, start, end):
         current_node = C.current_node(new_x, new_y)
         #print(f"New Node: H:{new_x}, V:{new_y}\n")
         path.append(current_node)
-        counter += 1
+        
+        # commented out for perfomance
+        
+        # counter += 1
     # get end time, print total
     timeEnd = time.time()
     tam = timeEnd - timeStart
-    print(f"Agent determined a route using Q-values in {tam:.4} seconds.\n")
+    print(f"Agent determined a route using Q-values in {tam:.8} seconds.\n")
     # call function in city.py to create visual graph
     C.print_path(city, start, end, path)
     # i think thats it

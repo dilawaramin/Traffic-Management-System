@@ -77,4 +77,4 @@ def print_path_and_metrics(city, start, end, path, start_time, end_time, visited
     num_computations = len(visited)
     # Output similar to qlearn.py
     C.print_path(city, start, end, path)
-    print(f"Path found by BFS in {duration:.4f} seconds with {num_computations} computations.")
+    print(f"Path found by BFS in {duration:.8f} seconds with {num_computations} computations.")
